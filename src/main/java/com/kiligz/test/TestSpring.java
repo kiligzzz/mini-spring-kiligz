@@ -15,13 +15,25 @@ public class TestSpring {
         beanFactory.registerBeanDefinition("kiligzService", beanDefinition);
 
         KiligzService kiligService = (KiligzService) beanFactory.getBean("kiligzService");
-        System.out.println(kiligService);
-        kiligService.helloWorld();
+        kiligService.helle();
     }
 
     public static class KiligzService {
-        public void helloWorld() {
-            System.out.println("hello world");
+        String name;
+
+        public KiligzService() {
+        }
+
+        public KiligzService(String name) {
+            this.name = name;
+        }
+
+        public void helle() {
+            System.out.println("hello");
+        }
+
+        public void helleName() {
+            System.out.println("hello " + name);
         }
     }
 }
