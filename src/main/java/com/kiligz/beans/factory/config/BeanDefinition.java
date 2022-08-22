@@ -1,9 +1,6 @@
 package com.kiligz.beans.factory.config;
 
-import com.kiligz.beans.factory.PropertyValue;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.kiligz.beans.factory.PropertyValues;
 
 /**
  * 定义bean信息的类
@@ -15,15 +12,16 @@ import java.util.List;
 public class BeanDefinition {
     private Class<?> beanClass;
 
-    private List<PropertyValue> propertyValueList = new ArrayList<>();
+    private PropertyValues propertyValues;
 
     public BeanDefinition(Class<?> beanClass) {
         this.beanClass = beanClass;
     }
 
-    public BeanDefinition(Class<?> beanClass, List<PropertyValue> propertyValueList) {
+    public BeanDefinition(Class<?> beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
-        this.propertyValueList = propertyValueList;
+        this.propertyValues = propertyValues == null ?
+                new PropertyValues() : propertyValues;
     }
 
     public Class<?> getBeanClass() {
@@ -34,11 +32,11 @@ public class BeanDefinition {
         this.beanClass = beanClass;
     }
 
-    public List<PropertyValue> getPropertyValueList() {
-        return propertyValueList;
+    public PropertyValues getPropertyValues() {
+        return propertyValues;
     }
 
-    public void setPropertyValueList(List<PropertyValue> propertyValueList) {
-        this.propertyValueList = propertyValueList;
+    public void setPropertyValues(PropertyValues propertyValues) {
+        this.propertyValues = propertyValues;
     }
 }

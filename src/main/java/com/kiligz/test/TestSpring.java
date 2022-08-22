@@ -2,6 +2,7 @@ package com.kiligz.test;
 
 
 import com.kiligz.beans.factory.PropertyValue;
+import com.kiligz.beans.factory.PropertyValues;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.BeanReference;
 import com.kiligz.beans.factory.support.DefaultListableBeanFactory;
@@ -25,14 +26,14 @@ public class TestSpring {
         beanFactory.registerBeanDefinition("kiligzDao", new BeanDefinition(KiligzDao.class));
 
         // 设置KiligzService属性
-        List<PropertyValue> propertyValueList = new ArrayList<>();
+        PropertyValues propertyValues = new PropertyValues();
         PropertyValue prefix = new PropertyValue("prefix", "z:");
         PropertyValue kiligzDao = new PropertyValue("kiligzDao", new BeanReference("kiligzDao"));
-        propertyValueList.add(prefix);
-        propertyValueList.add(kiligzDao);
+        propertyValues.addPropertyValue(prefix);
+        propertyValues.addPropertyValue(kiligzDao);
 
         // 注册KiligzService
-        BeanDefinition beanDefinition = new BeanDefinition(KiligzService.class, propertyValueList);
+        BeanDefinition beanDefinition = new BeanDefinition(KiligzService.class, propertyValues);
         beanFactory.registerBeanDefinition("kiligzService", beanDefinition);
 
         // 获取KiligzService
