@@ -1,4 +1,4 @@
-package com.kiligz.beans.factory;
+package com.kiligz.beans;
 
 /**
  * Bean属性信息

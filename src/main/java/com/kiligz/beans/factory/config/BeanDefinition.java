@@ -1,6 +1,6 @@
 package com.kiligz.beans.factory.config;
 
-import com.kiligz.beans.factory.PropertyValues;
+import com.kiligz.beans.PropertyValues;
 
 /**
  * 定义bean信息的类
@@ -10,12 +10,18 @@ import com.kiligz.beans.factory.PropertyValues;
  * @date 2022/8/11 17:18
  */
 public class BeanDefinition {
+    /**
+     * Bean的类
+     */
     private Class<?> beanClass;
 
+    /**
+     * Bean的属性内容
+     */
     private PropertyValues propertyValues;
 
     public BeanDefinition(Class<?> beanClass) {
-        this.beanClass = beanClass;
+        this(beanClass, null);
     }
 
     public BeanDefinition(Class<?> beanClass, PropertyValues propertyValues) {

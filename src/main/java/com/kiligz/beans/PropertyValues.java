@@ -1,4 +1,4 @@
-package com.kiligz.beans.factory;
+package com.kiligz.beans;
 
 import java.util.ArrayList;
 import java.util.List;

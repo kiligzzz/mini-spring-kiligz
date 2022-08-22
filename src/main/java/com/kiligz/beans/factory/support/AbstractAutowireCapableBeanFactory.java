@@ -2,7 +2,8 @@ package com.kiligz.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.kiligz.beans.BeansException;
-import com.kiligz.beans.factory.PropertyValue;
+import com.kiligz.beans.PropertyValue;
+import com.kiligz.beans.factory.config.AutowireCapableBeanFactory;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.BeanReference;
 
@@ -15,7 +16,8 @@ import java.lang.reflect.Constructor;
  * @author Ivan
  * @date 2022/8/11 17:19
  */
-public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory
+        implements AutowireCapableBeanFactory {
 
     /**
      * Bean实例化策略

@@ -8,7 +8,6 @@ package com.kiligz.beans.factory.config;
  * @date 2022/8/11 17:19
  */
 public interface SingletonBeanRegistry {
-
     /**
      * 注册单例bean
      */

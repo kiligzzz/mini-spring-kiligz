@@ -1,6 +1,7 @@
 package com.kiligz.beans.factory.support;
 
 import com.kiligz.beans.BeansException;
+import com.kiligz.beans.factory.ConfigurableListableBeanFactory;
 import com.kiligz.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -12,7 +13,8 @@ import java.util.Map;
  * @author Ivan
  * @date 2022/8/11 17:22
  */
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry {
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
+        implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
     /**
      * 注册表
@@ -25,6 +27,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         beanDefinitionMap.put(beanName, beanDefinition);
+    }
+
+    /**
+     * 是否包含指定名称的BeanDefinition
+     */
+    @Override
+    public boolean containsBeanDefinition(String beanName) {
+        return beanDefinitionMap.containsKey(beanName);
     }
 
     /**
