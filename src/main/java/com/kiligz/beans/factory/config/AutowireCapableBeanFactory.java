@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.config;
 
+import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.BeanFactory;
 
 /**
@@ -9,4 +10,7 @@ import com.kiligz.beans.factory.BeanFactory;
  * @date 2022/8/22 11:00
  */
 public interface AutowireCapableBeanFactory extends BeanFactory {
+    Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException;
+
+    Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException;
 }

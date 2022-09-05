@@ -9,7 +9,7 @@
     <bean id="kiligzDao" name="kiligzDao" class="com.kiligz.test.KiligzDao"/>
 
     <bean id="kiligzService" name="kiligzService" class="com.kiligz.test.KiligzService">
-        <property name="prefix" value="z:"/>
+        <property name="prefix" value="test:"/>
         <property name="kiligzDao" ref="kiligzDao"/>
     </bean>
 </beans>

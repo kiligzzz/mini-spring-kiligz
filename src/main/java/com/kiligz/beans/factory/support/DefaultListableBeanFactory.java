@@ -38,10 +38,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     }
 
     /**
-     * 获取BeanDefinition，外部不可访问
+     * 获取BeanDefinition，用于BeanFactoryPostProcessor自定义修改BeanDefinition的属性值
      */
     @Override
-    protected BeanDefinition getBeanDefinition(String beanName) throws BeansException {
+    public BeanDefinition getBeanDefinition(String beanName) throws BeansException {
         BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
         if (beanDefinition == null)
             throw new BeansException("No bean named '" + beanName + "' is defined");

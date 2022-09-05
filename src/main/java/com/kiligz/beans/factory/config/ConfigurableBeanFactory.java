@@ -9,4 +9,5 @@ import com.kiligz.beans.factory.HierarchicalBeanFactory;
  * @date 2022/8/22 11:01
  */
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }
