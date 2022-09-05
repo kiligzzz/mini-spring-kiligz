@@ -12,4 +12,7 @@
         <property name="prefix" value="test:"/>
         <property name="kiligzDao" ref="kiligzDao"/>
     </bean>
+
+    <bean class="com.kiligz.test.KiligzBeanFactoryPostProcessor"/>
+    <bean class="com.kiligz.test.KiligzBeanPostProcessor"/>
 </beans>

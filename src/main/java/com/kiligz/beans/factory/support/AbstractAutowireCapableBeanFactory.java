@@ -35,6 +35,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = createBeanInstance(beanDefinition, args);
         applyPropertyValues(beanName, bean, beanDefinition);
         bean = initializeBean(beanName, bean, beanDefinition);
+        // 分隔符
+        System.out.println("=========================");
         addSingleton(beanName, bean);
         return bean;
     }

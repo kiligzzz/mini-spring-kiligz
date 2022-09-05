@@ -17,4 +17,9 @@ public interface ConfigurableListableBeanFactory extends AutowireCapableBeanFact
      * 获取BeanDefinition，用于BeanFactoryPostProcessor自定义修改BeanDefinition的属性值
      */
     BeanDefinition getBeanDefinition(String beanName) throws BeansException;
+
+    /**
+     * 提前实例化所有单例实例
+     */
+    void preInstantiateSingletons() throws BeansException;
 }
