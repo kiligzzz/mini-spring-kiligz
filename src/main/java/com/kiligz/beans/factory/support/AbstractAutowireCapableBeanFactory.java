@@ -1,14 +1,19 @@
 package com.kiligz.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
+import com.kiligz.beans.factory.DisposableBean;
+import com.kiligz.beans.factory.InitializingBean;
 import com.kiligz.beans.factory.config.AutowireCapableBeanFactory;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.BeanPostProcessor;
 import com.kiligz.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -32,12 +37,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException {
+        System.out.printf("----------> [ create bean: %s ]%n", beanName);
+
         Object bean = createBeanInstance(beanDefinition, args);
         applyPropertyValues(beanName, bean, beanDefinition);
         bean = initializeBean(beanName, bean, beanDefinition);
-        // 分隔符
-        System.out.println("=========================");
         addSingleton(beanName, bean);
+        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
         return bean;
     }
 
@@ -63,6 +69,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 为bean填充属性
      */
     protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        System.out.println("--------------> [ apply propertyValues ]");
         try {
             for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValues()) {
                 String name = propertyValue.getName();
@@ -85,13 +92,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 初始化bean
      */
     protected Object initializeBean(String beanName, Object existingBean, BeanDefinition beanDefinition) {
+        System.out.printf("--------------> [ initialize %s ]%n", beanName);
+
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(existingBean, beanName);
-        invokeInitMethods(beanName, wrappedBean, beanDefinition);
+
+        try {
+            invokeInitMethods(beanName, wrappedBean, beanDefinition);
+        } catch (Exception ex) {
+            throw new BeansException("Invocation of init method of bean[" + beanName + "] failed", ex);
+        }
+
         return applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
     }
 
     /**
-     * 执行BeanPostProcessors的postProcessBeforeInitialization方法
+     * 执行BeanPostProcessor的前置处理
      */
     @Override
     public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
@@ -99,16 +114,45 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 执行BeanPostProcessors的postProcessAfterInitialization方法
+     * 执行BeanPostProcessor的前置处理
      */
     @Override
     public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
         return applyBeanPostProcessor(existingBean, beanName, false);
     }
 
-    protected void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) {
-        //TODO 后面会实现
-        System.out.println("执行bean[" + beanName + "]的初始化方法");
+    /**
+     * 执行初始化方法
+     */
+    protected void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
+        System.out.println("------------------> [ invoke initMethods ]");
+
+        boolean isInitializeBean = bean instanceof InitializingBean;
+        if (isInitializeBean) {
+            ((InitializingBean) bean).afterPropertiesSet();
+        }
+
+        String initMethodName = beanDefinition.getInitMethodName();
+        // 避免同时继承自InitializingBean，且自定义方法与InitializingBean方法同名，初始化方法执行两次的情况
+        if (StrUtil.isNotEmpty(initMethodName) &&
+                !(isInitializeBean && "afterPropertiesSet".equals(initMethodName))) {
+            Method initMethod = ClassUtil.getPublicMethod(beanDefinition.getBeanClass(), initMethodName);
+            if (initMethod == null) {
+                throw new BeansException("Could not find an init method named '" + initMethodName + "' on bean with name '" + beanName + "'");
+            }
+            initMethod.invoke(bean);
+        }
+    }
+
+    /**
+     * 注册有销毁方法的bean，即bean继承自DisposableBean或有自定义的销毁方法
+     */
+    protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        System.out.println("--------------> [ register DisposableBean if need ]");
+
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
+            registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
+        }
     }
 
     /**

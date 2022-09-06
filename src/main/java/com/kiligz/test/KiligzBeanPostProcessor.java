@@ -10,7 +10,7 @@ import com.kiligz.beans.factory.config.BeanPostProcessor;
 public class KiligzBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        System.out.println("[ postProcess before ]");
+        System.out.println("------------------> [ postProcess before ]");
         if ("kiligzService".equals(beanName)) {
             ((KiligzService) bean).setPrefix("z:");
         }
@@ -19,7 +19,7 @@ public class KiligzBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        System.out.println("[ postProcess after ]");
+        System.out.println("------------------> [ postProcess after ]");
         return bean;
     }
 }

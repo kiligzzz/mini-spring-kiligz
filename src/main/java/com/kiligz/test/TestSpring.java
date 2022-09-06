@@ -1,6 +1,5 @@
 package com.kiligz.test;
 
-import com.kiligz.context.ApplicationContext;
 import com.kiligz.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -12,9 +11,16 @@ import com.kiligz.context.support.ClassPathXmlApplicationContext;
 public class TestSpring {
 
     public static void main(String[] args) {
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring/spring.xml");
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring/spring.xml");
+
+        System.out.println("\n============== 使用bean ==============");
+
         KiligzService kiligzService = (KiligzService) applicationContext.getBean("kiligzService");
         String name = kiligzService.queryName("001");
-        System.out.println(name);
+
+        System.out.println("结果:" + name);
+        System.out.println("=====================================\n");
+
+        applicationContext.registerShutdownHook();
     }
 }

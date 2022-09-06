@@ -32,6 +32,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public static final String CLASS_ATTRIBUTE = "class";
     public static final String VALUE_ATTRIBUTE = "value";
     public static final String REF_ATTRIBUTE = "ref";
+    public static final String INIT_METHOD_ATTRIBUTE = "init-method";
+    public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
 
     /**
      * 使用默认的资源加载器初始化
@@ -73,6 +75,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
      * 从输入流中加载BeanDefinition
      */
     private void doLoadBeanDefinitions(InputStream is) {
+        System.out.println("---> [ read xml && load beanDefinitions ] ");
+
         Document document = XmlUtil.readXML(is);
         Element root = document.getDocumentElement();
         NodeList childNodes = root.getChildNodes();
@@ -84,6 +88,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                     String id = bean.getAttribute(ID_ATTRIBUTE);
                     String name = bean.getAttribute(NAME_ATTRIBUTE);
                     String className = bean.getAttribute(CLASS_ATTRIBUTE);
+                    String initMethodName = bean.getAttribute(INIT_METHOD_ATTRIBUTE);
+                    String destroyMethodName = bean.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 
                     Class<?> clazz;
                     try {
@@ -97,7 +103,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                             : StrUtil.lowerFirst(clazz.getSimpleName());
 
                     BeanDefinition beanDefinition = new BeanDefinition(clazz);
-                    
+                    beanDefinition.setInitMethodName(initMethodName);
+                    beanDefinition.setDestroyMethodName(destroyMethodName);
+
                     NodeList beanChildNodes = bean.getChildNodes();
                     for (int j = 0; j < beanChildNodes.getLength(); j++) {
                         if (beanChildNodes.item(j) instanceof Element) {

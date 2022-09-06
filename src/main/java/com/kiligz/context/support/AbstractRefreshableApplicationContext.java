@@ -35,6 +35,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
      * 创建bean工厂
      */
     protected DefaultListableBeanFactory createBeanFactory() {
+        System.out.println("---> [ create defaultListableBeanFactory ] ");
         return new DefaultListableBeanFactory();
     }
 

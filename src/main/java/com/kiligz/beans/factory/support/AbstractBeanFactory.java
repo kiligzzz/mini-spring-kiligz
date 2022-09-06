@@ -41,6 +41,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      * 延迟加载bean的实现
      */
     protected Object doGetBean(String beanName, Object[] args) {
+        System.out.printf("-------> [ get bean: %s ]%n", beanName);
+
         Object bean = getSingleton(beanName);
         if (bean != null)
             return bean;

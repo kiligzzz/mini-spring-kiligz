@@ -14,6 +14,8 @@ import com.kiligz.beans.factory.config.BeanFactoryPostProcessor;
 public class KiligzBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        System.out.println("------> [ postProcessBeanFactory ]");
+
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition("kiligzService");
         PropertyValues propertyValues = beanDefinition.getPropertyValues();
         // 后面的会覆盖前面配置的

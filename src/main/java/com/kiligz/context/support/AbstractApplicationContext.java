@@ -23,25 +23,35 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     @Override
     public void refresh() throws BeansException {
-        //创建BeanFactory，并加载BeanDefinition
+        System.out.println("[ refresh ] ");
+
+        // 创建BeanFactory，并加载BeanDefinition
         refreshBeanFactory();
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-        //在bean实例化之前，执行BeanFactoryPostProcessor
+        // 在bean实例化之前，执行BeanFactoryPostProcessor
         invokeBeanFactoryPostProcessors(beanFactory);
 
-        //BeanPostProcessor需要提前于其他bean实例化之前注册
+        // BeanPostProcessor需要提前于其他bean实例化之前注册
         registerBeanPostProcessors(beanFactory);
 
-        //提前实例化单例bean
+        // 提前实例化单例bean
         beanFactory.preInstantiateSingletons();
+    }
+
+    /**
+     * 向虚拟机中注册一个钩子方法，在虚拟机关闭之前执行关闭容器等操作
+     */
+    @Override
+    public void registerShutdownHook() {
+        Thread shutdownHook = new Thread(this::doClose);
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
     }
 
     /**
      * 创建BeanFactory，并加载BeanDefinition
      */
     protected abstract void refreshBeanFactory() throws BeansException;
-
 
     /**
      * 获取BeanFactory
@@ -52,6 +62,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 在bean实例化之前，执行BeanFactoryPostProcessor
      */
     protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        System.out.println("---> [ invoke beanFactoryPostProcessor ] ");
+
         Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeansOfType(BeanFactoryPostProcessor.class);
         for (BeanFactoryPostProcessor beanFactoryPostProcessor : beanFactoryPostProcessorMap.values()) {
             beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
@@ -62,6 +74,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 注册BeanPostProcessor
      */
     protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        System.out.println("---> [ register beanPostProcessors ] ");
+
         Map<String, BeanPostProcessor> beanPostProcessorMap = beanFactory.getBeansOfType(BeanPostProcessor.class);
         for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
             beanFactory.addBeanPostProcessor(beanPostProcessor);
@@ -98,5 +112,28 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     @Override
     public Object getBean(String name, Object... args) throws BeansException {
         return getBeanFactory().getBean(name, args);
+    }
+
+    /**
+     * 关闭应用上下文
+     */
+    @Override
+    public void close() {
+        doClose();
+    }
+
+    /**
+     * 关闭应用上下文的实现
+     */
+    protected void doClose() {
+        System.out.println("[ do close ]");
+        destroyBeans();
+    }
+
+    /**
+     * 销毁所有拥有销毁方法的bean
+     */
+    protected void destroyBeans() {
+        getBeanFactory().destroySingletons();
     }
 }
