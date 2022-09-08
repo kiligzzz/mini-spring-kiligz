@@ -5,6 +5,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
+import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
 import com.kiligz.beans.factory.config.AutowireCapableBeanFactory;
@@ -14,8 +15,6 @@ import com.kiligz.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * 抽象的自动装配可用bean的工厂
@@ -91,10 +90,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     /**
      * 初始化bean
      */
-    protected Object initializeBean(String beanName, Object existingBean, BeanDefinition beanDefinition) {
+    protected Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
         System.out.printf("--------------> [ initialize %s ]%n", beanName);
 
-        Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(existingBean, beanName);
+        if (bean instanceof BeanFactoryAware) {
+            System.out.println("------------------> [ set beanFactory ]");
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
+
+        Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         try {
             invokeInitMethods(beanName, wrappedBean, beanDefinition);

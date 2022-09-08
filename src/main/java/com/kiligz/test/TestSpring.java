@@ -18,6 +18,9 @@ public class TestSpring {
         KiligzService kiligzService = (KiligzService) applicationContext.getBean("kiligzService");
         String name = kiligzService.queryName("001");
 
+        System.out.println(kiligzService.getApplicationContext());
+        System.out.println(kiligzService.getBeanFactory());
+
         System.out.println("结果:" + name);
         System.out.println("=====================================\n");
 

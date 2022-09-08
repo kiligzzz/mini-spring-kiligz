@@ -1,11 +1,18 @@
 package com.kiligz.test;
 
+import com.kiligz.beans.BeansException;
+import com.kiligz.beans.factory.BeanFactory;
+import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
+import com.kiligz.context.ApplicationContext;
+import com.kiligz.context.ApplicationContextAware;
 
-public class KiligzService implements InitializingBean, DisposableBean {
-    String prefix;
-    KiligzDao kiligzDao;
+public class KiligzService implements InitializingBean, DisposableBean, BeanFactoryAware, ApplicationContextAware {
+    private String prefix;
+    private KiligzDao kiligzDao;
+    private ApplicationContext applicationContext;
+    private BeanFactory beanFactory;
 
     public String getPrefix() {
         return prefix;
@@ -55,5 +62,24 @@ public class KiligzService implements InitializingBean, DisposableBean {
      */
     public void xmlDestroy() {
         System.out.println("---> [ KiligzService xml destroy ]");
+    }
+
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public BeanFactory getBeanFactory() {
+        return beanFactory;
     }
 }

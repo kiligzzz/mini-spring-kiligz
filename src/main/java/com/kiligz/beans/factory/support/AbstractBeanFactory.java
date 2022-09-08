@@ -1,7 +1,6 @@
 package com.kiligz.beans.factory.support;
 
 import com.kiligz.beans.BeansException;
-import com.kiligz.beans.factory.BeanFactory;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.BeanPostProcessor;
 import com.kiligz.beans.factory.config.ConfigurableBeanFactory;
