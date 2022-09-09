@@ -1,12 +1,20 @@
 package com.kiligz.context.support;
 
+import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.ConfigurableListableBeanFactory;
 import com.kiligz.beans.factory.config.BeanFactoryPostProcessor;
 import com.kiligz.beans.factory.config.BeanPostProcessor;
+import com.kiligz.context.ApplicationEvent;
+import com.kiligz.context.ApplicationListener;
 import com.kiligz.context.ConfigurableApplicationContext;
+import com.kiligz.context.event.ApplicationEventMulticaster;
+import com.kiligz.context.event.ContextClosedEvent;
+import com.kiligz.context.event.ContextRefreshedEvent;
+import com.kiligz.context.event.SimpleApplicationEventMulticaster;
 import com.kiligz.core.io.DefaultResourceLoader;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -17,6 +25,11 @@ import java.util.Map;
  */
 public abstract class AbstractApplicationContext extends DefaultResourceLoader
         implements ConfigurableApplicationContext {
+
+    /**
+     * 应用事件广播器
+     */
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     /**
      * 刷新容器
@@ -38,8 +51,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         // BeanPostProcessor需要提前于其他bean实例化之前注册
         registerBeanPostProcessors(beanFactory);
 
+        // 初始化应用事件广播器
+        initApplicationEventMulticaster();
+
+        // 注册事件监听器
+        registerListeners();
+
         // 提前实例化单例bean
         beanFactory.preInstantiateSingletons();
+
+        // 发布容器刷新完成事件
+        finishRefresh();
     }
 
     /**
@@ -83,6 +105,49 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
             beanFactory.addBeanPostProcessor(beanPostProcessor);
         }
+    }
+
+    /**
+     * 初始化应用事件广播器
+     */
+    private void initApplicationEventMulticaster() {
+        System.out.println("---> [ init ApplicationEventMulticaster ] ");
+
+        ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+        applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
+
+        String beanName = StrUtil.lowerFirst(applicationEventMulticaster.getClass().getSimpleName());
+        beanFactory.registerSingleton(beanName, applicationEventMulticaster);
+    }
+
+    /**
+     * 注册事件监听器
+     */
+    @SuppressWarnings("all")
+    protected void registerListeners() {
+        System.out.println("---> [ register ApplicationListeners ] ");
+
+        Collection<ApplicationListener> applicationListeners = getBeansOfType(ApplicationListener.class).values();
+        for (ApplicationListener applicationListener : applicationListeners) {
+            applicationEventMulticaster.addApplicationListener(applicationListener);
+        }
+    }
+
+    /**
+     * 发布容器刷新完成事件
+     */
+    protected void finishRefresh() {
+        publishEvent(new ContextRefreshedEvent(this));
+    }
+
+    /**
+     * 发布事件
+     */
+    @Override
+    public void publishEvent(ApplicationEvent event) {
+        System.out.printf("---> [ publish %s ]%n", event.getClass().getSimpleName());
+
+        applicationEventMulticaster.multicastEvent(event);
     }
 
     /**
@@ -130,6 +195,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     protected void doClose() {
         System.out.println("[ do close ]");
+        //发布容器关闭事件
+        publishEvent(new ContextClosedEvent(this));
         destroyBeans();
     }
 

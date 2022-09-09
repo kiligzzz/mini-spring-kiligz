@@ -13,5 +13,5 @@ import com.kiligz.core.io.ResourceLoader;
  * @author Ivan
  * @date 2022/9/5 16:48
  */
-public interface ApplicationContext extends HierarchicalBeanFactory, ListableBeanFactory, ResourceLoader {
+public interface ApplicationContext extends ApplicationEventPublisher, HierarchicalBeanFactory, ListableBeanFactory, ResourceLoader {
 }
