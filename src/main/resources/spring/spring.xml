@@ -9,11 +9,14 @@
     <bean id="kiligzDao" name="kiligzDao" class="com.kiligz.test.KiligzDao"/>
 
     <bean id="kiligzService" name="kiligzService" class="com.kiligz.test.KiligzService"
-          init-method="init" destroy-method="xmlDestroy">
+          init-method="init" destroy-method="xmlDestroy" scope="prototype">
         <property name="prefix" value="test:"/>
         <property name="kiligzDao" ref="kiligzDao"/>
     </bean>
 
     <bean class="com.kiligz.test.KiligzBeanFactoryPostProcessor"/>
     <bean class="com.kiligz.test.KiligzBeanPostProcessor"/>
+    <bean id="kiligzFactoryBean" name="kiligzFactoryBean" class="com.kiligz.test.KiligzFactoryBean">
+        <property name="prefix" value="zzz"/>
+    </bean>
 </beans>

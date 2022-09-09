@@ -1,12 +1,15 @@
 package com.kiligz.beans.factory.support;
 
 import com.kiligz.beans.BeansException;
+import com.kiligz.beans.factory.FactoryBean;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.BeanPostProcessor;
 import com.kiligz.beans.factory.config.ConfigurableBeanFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 抽象的bean工厂，提供获取bean的方法
@@ -19,6 +22,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
         implements ConfigurableBeanFactory {
 
     private final List<BeanPostProcessor> beanPostProcessorList = new ArrayList<>();
+
+    private final Map<String, Object> factoryBeanCache = new HashMap<>();
 
     /**
      * 延迟加载，在使用bean时才加载创建bean，使用前以BeanDefinition保存对应信息
@@ -42,12 +47,13 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
     protected Object doGetBean(String beanName, Object[] args) {
         System.out.printf("-------> [ get bean: %s ]%n", beanName);
 
-        Object bean = getSingleton(beanName);
-        if (bean != null)
-            return bean;
+        Object sharedInstance = getSingleton(beanName);
+        if (sharedInstance != null)
+            return getObjectForBeanInstance(sharedInstance, beanName);
 
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
-        return createBean(beanName, beanDefinition, args);
+        Object bean = createBean(beanName, beanDefinition, args);
+        return getObjectForBeanInstance(bean, beanName);
     }
 
     /**
@@ -74,5 +80,30 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      */
     public List<BeanPostProcessor> getBeanPostProcessors() {
         return beanPostProcessorList;
+    }
+
+    /**
+     * 如果是FactoryBean，从FactoryBean#getObject中创建bean
+     */
+    public Object getObjectForBeanInstance(Object beanInstance, String beanName) {
+        Object bean = beanInstance;
+        if (beanInstance instanceof FactoryBean<?>) {
+            System.out.println("----------> [ FactoryBean get object ]");
+
+            FactoryBean<?> factoryBean = (FactoryBean<?>) beanInstance;
+            try {
+                if (factoryBean.isSingleton()) {
+                    bean = factoryBeanCache.get(beanName);
+                    if (bean == null) {
+                        bean = factoryBean.getObject();
+                    }
+                } else {
+                    bean = factoryBean.getObject();
+                }
+            } catch (Exception e) {
+                throw new BeansException("FactoryBean threw exception on object[" + beanName + "] creation", e);
+            }
+        }
+        return bean;
     }
 }

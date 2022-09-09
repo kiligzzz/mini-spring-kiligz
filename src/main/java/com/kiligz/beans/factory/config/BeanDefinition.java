@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.PropertyValues;
 
 /**
@@ -30,6 +31,11 @@ public class BeanDefinition {
      */
     private String destroyMethodName;
 
+    /**
+     * bean域，默认是singleton
+     */
+    private BeanScope beanScope;
+
     public BeanDefinition(Class<?> beanClass) {
         this(beanClass, null);
     }
@@ -38,6 +44,7 @@ public class BeanDefinition {
         this.beanClass = beanClass;
         this.propertyValues = propertyValues == null ?
                 new PropertyValues() : propertyValues;
+        this.beanScope = BeanScope.singleton;
     }
 
     public Class<?> getBeanClass() {
@@ -70,5 +77,24 @@ public class BeanDefinition {
 
     public void setDestroyMethodName(String destroyMethodName) {
         this.destroyMethodName = destroyMethodName;
+    }
+
+    public void setBeanScope(String beanScope) {
+        if (StrUtil.isNotEmpty(beanScope)) {
+            this.beanScope = BeanScope.valueOf(beanScope);
+        }
+    }
+
+    public boolean isSingleton() {
+        return beanScope == BeanScope.singleton;
+    }
+
+    public boolean isPrototype() {
+        return beanScope == BeanScope.prototype;
+    }
+
+    enum BeanScope {
+        singleton,
+        prototype
     }
 }
