@@ -6,17 +6,17 @@
 
     <!--  Spring的配置文件，主要配置和业务逻辑有关的  -->
 
-    <bean id="kiligzDao" name="kiligzDao" class="com.kiligz.test.KiligzDao"/>
+    <bean id="kiligzDao" name="kiligzDao" class="com.kiligz.test.ioc.KiligzDao"/>
 
-    <bean id="kiligzService" name="kiligzService" class="com.kiligz.test.KiligzService"
+    <bean id="kiligzService" name="kiligzService" class="com.kiligz.test.ioc.KiligzService"
           init-method="init" destroy-method="xmlDestroy">
         <property name="prefix" value="test:"/>
         <property name="kiligzDao" ref="kiligzDao"/>
     </bean>
 
-    <bean class="com.kiligz.test.KiligzBeanFactoryPostProcessor"/>
-    <bean class="com.kiligz.test.KiligzBeanPostProcessor"/>
-    <bean id="kiligzFactoryBean" name="kiligzFactoryBean" class="com.kiligz.test.KiligzFactoryBean">
+    <bean class="com.kiligz.test.ioc.KiligzBeanFactoryPostProcessor"/>
+    <bean class="com.kiligz.test.ioc.KiligzBeanPostProcessor"/>
+    <bean id="kiligzFactoryBean" name="kiligzFactoryBean" class="com.kiligz.test.ioc.KiligzFactoryBean">
         <property name="prefix" value="zzz"/>
     </bean>
 </beans>

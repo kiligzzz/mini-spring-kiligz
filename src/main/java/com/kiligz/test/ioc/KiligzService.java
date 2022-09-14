@@ -1,4 +1,4 @@
-package com.kiligz.test;
+package com.kiligz.test.ioc;
 
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.BeanFactory;
