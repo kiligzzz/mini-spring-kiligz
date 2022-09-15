@@ -5,6 +5,7 @@ import com.kiligz.aop.TargetSource;
 import com.kiligz.aop.aspectj.AspectjExpressionPointcut;
 import com.kiligz.aop.framework.AopProxy;
 import com.kiligz.aop.framework.CglibAopProxy;
+import com.kiligz.aop.framework.ProxyFactory;
 
 /**
  * @author Ivan
@@ -16,13 +17,12 @@ public class TestAop {
         AspectjExpressionPointcut methodMatcher =
                 new AspectjExpressionPointcut("execution(* com.kiligz.test.aop.AopService.*(..))");
 
-        AdvisedSupport advised = new AdvisedSupport();
-        advised.setTargetSource(new TargetSource(new AopService()));
-        advised.setMethodMatcher(methodMatcher);
-        advised.setMethodInterceptor(new AopServiceInterceptor());
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.setTargetSource(new TargetSource(new AopService()));
+        proxyFactory.setMethodMatcher(methodMatcher);
+        proxyFactory.setMethodInterceptor(new AopServiceInterceptor());
 
-        AopProxy aopProxy = new CglibAopProxy(advised);
-        AopService proxy = (AopService) aopProxy.getProxy();
+        AopService proxy = (AopService) proxyFactory.getProxy();
         proxy.printAop();
     }
 }
