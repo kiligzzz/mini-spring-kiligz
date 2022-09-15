@@ -6,6 +6,7 @@ import com.kiligz.aop.aspectj.AspectjExpressionPointcut;
 import com.kiligz.aop.framework.AopProxy;
 import com.kiligz.aop.framework.CglibAopProxy;
 import com.kiligz.aop.framework.ProxyFactory;
+import com.kiligz.aop.framework.adapter.MethodBeforeAdviceInterceptor;
 
 /**
  * @author Ivan
@@ -20,7 +21,7 @@ public class TestAop {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTargetSource(new TargetSource(new AopService()));
         proxyFactory.setMethodMatcher(methodMatcher);
-        proxyFactory.setMethodInterceptor(new AopServiceInterceptor());
+        proxyFactory.setMethodInterceptor(new MethodBeforeAdviceInterceptor(new AopServiceBefore()));
 
         AopService proxy = (AopService) proxyFactory.getProxy();
         proxy.printAop();

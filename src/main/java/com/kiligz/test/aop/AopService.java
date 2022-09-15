@@ -6,6 +6,6 @@ package com.kiligz.test.aop;
  */
 public class AopService {
     public void printAop() {
-        System.out.println("[ aop ]");
+        System.out.println("[ print aop ]");
     }
 }
