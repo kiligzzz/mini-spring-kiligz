@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * 支持aspectj表达式的切点
+ *
  * @author Ivan
  * @date 2022/9/13 18:09
  */
