@@ -30,21 +30,21 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      */
     @Override
     public Object getBean(String beanName) throws BeansException {
-        return doGetBean(beanName, null);
+        return doGetBean(beanName);
     }
 
     /**
-     * 延迟加载，在使用bean时才加载创建bean，使用前以BeanDefinition保存对应信息（带参数）
+     * 延迟加载，在使用bean时才加载创建bean，使用前以BeanDefinition保存对应信息，通过传递class对象确定返回类型
      */
     @Override
-    public Object getBean(String beanName, Object... args) throws BeansException {
-        return doGetBean(beanName, args);
+    public <T> T getBean(String beanName, Class<T> beanClass) throws BeansException {
+        return beanClass.cast(doGetBean(beanName));
     }
 
     /**
      * 延迟加载bean的实现
      */
-    protected Object doGetBean(String beanName, Object[] args) {
+    protected Object doGetBean(String beanName) {
         System.out.printf("-------> [ get bean: %s ]%n", beanName);
 
         Object sharedInstance = getSingleton(beanName);
@@ -52,7 +52,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
             return getObjectForBeanInstance(sharedInstance, beanName);
 
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
-        Object bean = createBean(beanName, beanDefinition, args);
+        Object bean = createBean(beanName, beanDefinition);
         return getObjectForBeanInstance(bean, beanName);
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
     /**
      * 根据BeanDefinition创建bean，延迟实现
      */
-    protected abstract Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException;
+    protected abstract Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException;
 
     /**
      * 添加允许修改或替换实例化后的bean的扩展，存在则覆盖

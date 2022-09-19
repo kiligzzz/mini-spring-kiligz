@@ -8,10 +8,7 @@ import com.kiligz.beans.PropertyValue;
 import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
-import com.kiligz.beans.factory.config.AutowireCapableBeanFactory;
-import com.kiligz.beans.factory.config.BeanDefinition;
-import com.kiligz.beans.factory.config.BeanPostProcessor;
-import com.kiligz.beans.factory.config.BeanReference;
+import com.kiligz.beans.factory.config.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -32,13 +29,38 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private final InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
     /**
-     * 根据BeanDefinition创建bean，创建完成后加入单例的bean表中
+     * 根据BeanDefinition创建bean
      */
     @Override
-    protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException {
+    protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
         System.out.printf("----------> [ create bean: %s ]%n", beanName);
+        
+        // 如果bean需要代理，则直接返回代理对象
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+        if (bean != null)
+            return bean;
+        
+        return doCreateBean(beanName, beanDefinition);
+    }
 
-        Object bean = createBeanInstance(beanDefinition, args);
+    /**
+     * 在实例化之前判断是否需要代理bean，执行InstantiationAwareBeanPostProcessor的方法
+     */
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanName, beanDefinition.getBeanClass());
+
+        if (bean != null)
+            // 只走了postProcess after ???
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+
+        return bean;
+    }
+
+    /**
+     * 根据BeanDefinition创建bean，创建完成后加入单例的bean表中
+     */
+    private Object doCreateBean(String beanName, BeanDefinition beanDefinition) {
+        Object bean = createBeanInstance(beanDefinition);
         applyPropertyValues(beanName, bean, beanDefinition);
         bean = initializeBean(beanName, bean, beanDefinition);
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
@@ -49,21 +71,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 依据策略实例化bean
+     * 应用实例化之前的BeanPostProcessors
      */
-    protected Object createBeanInstance(BeanDefinition beanDefinition, Object[] args) {
-        if (args == null)
-            return instantiationStrategy.instantiate(beanDefinition, null, null);
-
-        Constructor<?> ctorToUse = null;
-        Class<?> beanClass = beanDefinition.getBeanClass();
-        for (Constructor<?> ctor : beanClass.getDeclaredConstructors()) {
-            if (ctor.getParameterTypes().length == args.length) {
-                ctorToUse = ctor;
-                break;
+    protected Object applyBeanPostProcessorsBeforeInstantiation(String beanName, Class<?> beanClass) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object bean = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (bean != null)
+                    return bean;
             }
         }
-        return instantiationStrategy.instantiate(beanDefinition, ctorToUse, args);
+        return null;
+    }
+
+    /**
+     * 依据策略实例化bean
+     */
+    protected Object createBeanInstance(BeanDefinition beanDefinition) {
+        return instantiationStrategy.instantiate(beanDefinition);
     }
 
     /**
@@ -177,5 +202,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             result = current;
         }
         return result;
+    }
+
+    /**
+     * 获取实例化策略
+     */
+    public InstantiationStrategy getInstantiationStrategy() {
+        return instantiationStrategy;
     }
 }

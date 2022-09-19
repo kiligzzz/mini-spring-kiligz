@@ -170,16 +170,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 获取bean
      */
     @Override
-    public Object getBean(String name) throws BeansException {
-        return getBeanFactory().getBean(name);
+    public Object getBean(String beanName) throws BeansException {
+        return getBeanFactory().getBean(beanName);
     }
 
     /**
-     * 获取bean
+     * 获取bean，根据beanClass类型确定返回类型
      */
-    @Override
-    public Object getBean(String name, Object... args) throws BeansException {
-        return getBeanFactory().getBean(name, args);
+    public <T> T getBean(String beanName, Class<T> beanClass) throws BeansException {
+        return getBeanFactory().getBean(beanName, beanClass);
     }
 
     /**

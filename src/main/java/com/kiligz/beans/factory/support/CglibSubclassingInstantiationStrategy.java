@@ -19,14 +19,12 @@ public class CglibSubclassingInstantiationStrategy implements InstantiationStrat
      * 使用Cglib动态生成子类
      */
     @Override
-    public Object instantiate(BeanDefinition beanDefinition, Constructor<?> ctor, Object[] args) throws BeansException {
+    public Object instantiate(BeanDefinition beanDefinition) throws BeansException {
         System.out.printf("--------------> [ cglib create %s instance ]%n", beanDefinition.getBeanClass().getSimpleName());
 
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(beanDefinition.getBeanClass());
         enhancer.setCallback(NoOp.INSTANCE);
-        return ctor == null ?
-                enhancer.create() :
-                enhancer.create(ctor.getParameterTypes(), args);
+        return enhancer.create();
     }
 }

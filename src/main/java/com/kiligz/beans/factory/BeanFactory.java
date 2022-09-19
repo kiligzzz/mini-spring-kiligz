@@ -10,7 +10,7 @@ import com.kiligz.beans.BeansException;
  * @date 2022/8/11 17:22
  */
 public interface BeanFactory {
-    Object getBean(String name) throws BeansException;
+    Object getBean(String beanName) throws BeansException;
 
-    Object getBean(String name, Object... args) throws BeansException;
+    <T> T getBean(String beanName, Class<T> beanClass) throws BeansException;
 }

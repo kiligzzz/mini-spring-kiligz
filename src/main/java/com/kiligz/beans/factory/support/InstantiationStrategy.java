@@ -17,5 +17,5 @@ public interface InstantiationStrategy {
     /**
      * 实例化Bean
      */
-    Object instantiate(BeanDefinition beanDefinition, Constructor<?> ctor, Object[] args) throws BeansException;
+    Object instantiate(BeanDefinition beanDefinition) throws BeansException;
 }

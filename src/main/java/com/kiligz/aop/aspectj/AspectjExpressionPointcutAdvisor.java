@@ -21,6 +21,11 @@ public class AspectjExpressionPointcutAdvisor implements PointcutAdvisor {
      */
     private Advice advice;
 
+    /**
+     * aspectj表达式
+     */
+    private String expression;
+
     public AspectjExpressionPointcutAdvisor() {
     }
 
@@ -36,11 +41,14 @@ public class AspectjExpressionPointcutAdvisor implements PointcutAdvisor {
 
     @Override
     public Pointcut getPointcut() {
+        if (pointcut == null) {
+            pointcut = new AspectjExpressionPointcut(expression);
+        }
         return pointcut;
     }
 
     public void setExpression(String expression) {
-        this.pointcut = new AspectjExpressionPointcut(expression);
+        this.expression = expression;
     }
 
     public void setAdvice(Advice advice) {

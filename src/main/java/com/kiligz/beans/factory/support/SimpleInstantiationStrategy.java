@@ -18,14 +18,10 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
      * 使用Bean的构造函数来实例化
      */
     @Override
-    public Object instantiate(BeanDefinition beanDefinition, Constructor<?> ctor, Object[] args) throws BeansException {
+    public Object instantiate(BeanDefinition beanDefinition) throws BeansException {
         Class<?> clazz = beanDefinition.getBeanClass();
         try {
-            if (ctor == null) {
-                return clazz.getDeclaredConstructor().newInstance();
-            } else {
-                return clazz.getDeclaredConstructor(ctor.getParameterTypes()).newInstance(args);
-            }
+            return clazz.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new BeansException("Failed to instantiate [" + clazz.getName() + "]", e);
         }

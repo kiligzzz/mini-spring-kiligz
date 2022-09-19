@@ -12,9 +12,16 @@ import org.aopalliance.intercept.MethodInvocation;
  * @date 2022/9/15 14:28
  */
 public class MethodBeforeAdviceInterceptor implements BeforeAdvice, MethodInterceptor {
-    private final MethodBeforeAdvice advice;
+    private MethodBeforeAdvice advice;
+
+    public MethodBeforeAdviceInterceptor() {
+    }
 
     public MethodBeforeAdviceInterceptor(MethodBeforeAdvice advice) {
+        this.advice = advice;
+    }
+
+    public void setAdvice(MethodBeforeAdvice advice) {
         this.advice = advice;
     }
 
