@@ -71,7 +71,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 应用实例化之前的BeanPostProcessors
+     * 应用实例化之前的BeanPostProcessors（如使用pointcutAdvisor为其生成代理对象）
      */
     protected Object applyBeanPostProcessorsBeforeInstantiation(String beanName, Class<?> beanClass) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
@@ -104,6 +104,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 if (value instanceof BeanReference) {
                     // beanA依赖beanB，先实例化beanB
                     BeanReference beanReference = (BeanReference) value;
+                    System.out.printf("-------> [ ref bean: %s ]%n", beanReference.getBeanName());
                     value = getBean(beanReference.getBeanName());
                 }
                 // 属性填充
@@ -179,7 +180,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 注册有销毁方法的bean（singleton类型的bean才需要注册），即bean继承自DisposableBean或有自定义的销毁方法
      */
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
-        System.out.println("--------------> [ register DisposableBean if need ]");
 
         if (beanDefinition.isSingleton()) {
             if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {

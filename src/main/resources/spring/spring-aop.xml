@@ -20,4 +20,7 @@
     </bean>
 
     <bean id="beforeAdvice" class="com.kiligz.test.aop.AopServiceBefore"/>
+
+    <bean class="com.kiligz.test.aop.ContextRefreshedEventListener"/>
+    <bean class="com.kiligz.test.aop.ContextClosedEventListener"/>
 </beans>

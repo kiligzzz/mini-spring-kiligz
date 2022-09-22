@@ -35,12 +35,12 @@ public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, Instant
 
     @Override
     public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-        System.out.println("------------------> [ postProcess before instantiation ]");
-
-        // 避免死循环
+        // 避免死循环，利用advisor生成代理对象，advisor就不需要了
         if (isInfrastructureClass(beanClass)) {
             return null;
         }
+
+        System.out.println("------------------> [ postProcess before instantiation (autoProxy) ]");
 
         Collection<AspectjExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectjExpressionPointcutAdvisor.class).values();
         try {

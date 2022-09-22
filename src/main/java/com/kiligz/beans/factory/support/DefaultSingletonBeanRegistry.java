@@ -52,6 +52,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
      * 注册有销毁方法的bean
      */
     public void registerDisposableBean(String beanName, DisposableBean bean) {
+        System.out.println("--------------> [ register DisposableBean ]");
         disposableBeans.put(beanName, bean);
     }
 

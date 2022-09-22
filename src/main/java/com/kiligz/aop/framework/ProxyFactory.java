@@ -15,10 +15,10 @@ public class ProxyFactory extends AdvisedSupport {
 
     private AopProxy createAopProxy() {
         if (getTargetSource().getTargetClass().length > 0) {
-            System.out.println("[ jdk aop ]");
+            System.out.printf("-------> [ jdk aop %s ]%n", getTargetSource().getTarget().getClass().getSimpleName());
             return new JdkDynamicAopProxy(this);
         }
-        System.out.println("[ cglib aop ]");
+        System.out.printf("-------> [ cglib aop %s ]%n", getTargetSource().getTarget().getClass().getSimpleName());
         return new CglibAopProxy(this);
     }
 }

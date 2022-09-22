@@ -10,7 +10,7 @@ import com.kiligz.beans.BeansException;
  */
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
     /**
-     * 在bean实例化之前执行
+     * 在bean实例化之前执行（如使用pointcutAdvisor为其生成代理对象）
      */
     Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
 }

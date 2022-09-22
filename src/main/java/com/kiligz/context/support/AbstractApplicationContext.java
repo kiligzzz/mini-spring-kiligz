@@ -38,29 +38,31 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     public void refresh() throws BeansException {
         System.out.println("[ refresh ] ");
 
-        // 创建BeanFactory，并加载BeanDefinition
+        // 1. 创建BeanFactory，并加载BeanDefinition
         refreshBeanFactory();
+
+        // 2. 获取 BeanFactory
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-        //添加ApplicationContextAwareProcessor，让继承自ApplicationContextAware的bean能感知所属ApplicationContext
+        // 3. 添加ApplicationContextAwareProcessor，让继承自ApplicationContextAware的bean能感知所属ApplicationContext
         beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
-        // 在bean实例化之前，执行BeanFactoryPostProcessor
+        // 4. 在bean实例化之前，执行BeanFactoryPostProcessor
         invokeBeanFactoryPostProcessors(beanFactory);
 
-        // BeanPostProcessor需要提前于其他bean实例化之前注册
+        // 5. BeanPostProcessor需要提前于其他bean实例化之前注册
         registerBeanPostProcessors(beanFactory);
 
-        // 初始化应用事件广播器
+        // 6. 初始化应用事件广播器
         initApplicationEventMulticaster();
 
-        // 注册事件监听器
+        // 7. 注册事件监听器
         registerListeners();
 
-        // 提前实例化单例bean
+        // 8. 提前实例化单例bean
         beanFactory.preInstantiateSingletons();
 
-        // 发布容器刷新完成事件
+        // 9. 发布容器刷新完成事件
         finishRefresh();
     }
 
