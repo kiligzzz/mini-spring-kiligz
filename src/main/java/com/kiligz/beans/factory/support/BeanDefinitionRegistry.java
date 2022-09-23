@@ -19,4 +19,9 @@ public interface BeanDefinitionRegistry {
      * 是否包含指定名称的BeanDefinition
      */
     boolean containsBeanDefinition(String beanName);
+
+    /**
+     * 向注册表中注册BeanDefinition，不允许重复的
+     */
+    void registerBeanDefinitionWithNoRepeated(String beanName, BeanDefinition beanDefinition);
 }

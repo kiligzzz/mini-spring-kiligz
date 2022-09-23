@@ -184,6 +184,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     }
 
     /**
+     * 获取bean，根据beanClass类型确定返回类型，以首字母小写的class名称作为beanName
+     */
+    public <T> T getBean(Class<T> beanClass) throws BeansException {
+        return getBeanFactory().getBean(beanClass);
+    }
+
+    /**
      * 关闭应用上下文
      */
     @Override

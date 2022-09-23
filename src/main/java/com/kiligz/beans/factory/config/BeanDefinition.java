@@ -81,8 +81,12 @@ public class BeanDefinition {
 
     public void setBeanScope(String beanScope) {
         if (StrUtil.isNotEmpty(beanScope)) {
-            this.beanScope = BeanScope.valueOf(beanScope);
+            setBeanScope(BeanScope.valueOf(beanScope));
         }
+    }
+
+    public void setBeanScope(BeanScope beanScope) {
+        this.beanScope = beanScope;
     }
 
     public boolean isSingleton() {
@@ -93,7 +97,7 @@ public class BeanDefinition {
         return beanScope == BeanScope.prototype;
     }
 
-    enum BeanScope {
+    public enum BeanScope {
         singleton,
         prototype
     }

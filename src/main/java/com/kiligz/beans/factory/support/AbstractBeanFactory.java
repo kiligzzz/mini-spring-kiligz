@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.support;
 
+import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.FactoryBean;
 import com.kiligz.beans.factory.config.BeanDefinition;
@@ -38,6 +39,16 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      */
     @Override
     public <T> T getBean(String beanName, Class<T> beanClass) throws BeansException {
+        return beanClass.cast(doGetBean(beanName));
+    }
+
+    /**
+     * 延迟加载，在使用bean时才加载创建bean，使用前以BeanDefinition保存对应信息，通过传递class对象确定返回类型
+     * 首字母小写的class名称作为beanName
+     */
+    @Override
+    public <T> T getBean(Class<T> beanClass) throws BeansException {
+        String beanName = StrUtil.lowerFirst(beanClass.getSimpleName());
         return beanClass.cast(doGetBean(beanName));
     }
 

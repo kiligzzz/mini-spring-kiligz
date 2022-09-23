@@ -14,7 +14,7 @@ public class TestExtend {
     }
 
     public static void testPlaceholder() {
-        Placeholder placeholder = context.getBean("placeholder", Placeholder.class);
+        Placeholder placeholder = context.getBean(Placeholder.class);
         System.out.println(placeholder.getName());
     }
 }
