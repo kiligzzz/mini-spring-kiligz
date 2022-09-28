@@ -1,6 +1,7 @@
 package com.kiligz.context.annotation;
 
 import cn.hutool.core.util.StrUtil;
+import com.kiligz.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.support.BeanDefinitionRegistry;
 import com.kiligz.stereotype.Component;
@@ -14,12 +15,21 @@ import java.util.Set;
  * @date 2022/9/23 12:11
  */
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
+    /**
+     * 自动装配注解处理器的bean名称
+     */
+    public static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME =
+            StrUtil.lowerFirst(AutowiredAnnotationBeanPostProcessor.class.getSimpleName());
+
     private final BeanDefinitionRegistry registry;
 
     public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry) {
         this.registry = registry;
     }
 
+    /**
+     * 扫描指定包下的注解
+     */
     public void doScan(String... basePackages) {
         for (String basePackage : basePackages) {
             Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
@@ -30,6 +40,10 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                 registry.registerBeanDefinitionWithNoRepeated(beanName, candidate);
             }
         }
+
+        // 注册自动装配注解处理器的BeanDefinition
+        registry.registerBeanDefinitionWithNoRepeated(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
+                new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
     }
 
     /**

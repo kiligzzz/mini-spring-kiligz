@@ -1,5 +1,6 @@
 package com.kiligz.test.extend;
 
+import com.kiligz.beans.factory.annotation.Value;
 import com.kiligz.stereotype.Component;
 
 /**
@@ -7,14 +8,11 @@ import com.kiligz.stereotype.Component;
  * @date 2022/9/23 10:51
  */
 @Component
-public class Placeholder {
-    String name = "ivan";
+public class Ivan {
+    @Value("${name}")
+    String name;
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

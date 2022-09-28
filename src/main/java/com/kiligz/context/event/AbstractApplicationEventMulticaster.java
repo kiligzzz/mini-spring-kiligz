@@ -5,6 +5,7 @@ import com.kiligz.beans.factory.BeanFactory;
 import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.context.ApplicationEvent;
 import com.kiligz.context.ApplicationListener;
+import com.kiligz.util.ClassUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -59,8 +60,7 @@ public abstract class AbstractApplicationEventMulticaster implements Application
         Class<?> listenerClass = applicationListener.getClass();
 
         // 若经过实例化cglib代理则获取其superClass为原始类
-        Class<?> targetClass = isCglibProxyClass(listenerClass) ?
-                listenerClass.getSuperclass() : listenerClass;
+        Class<?> targetClass = ClassUtil.getOriginClass(listenerClass);
 
         Type genericInterface = targetClass.getGenericInterfaces()[0];
         Type actualTypeArgument = ((ParameterizedType) genericInterface).getActualTypeArguments()[0];
@@ -72,12 +72,5 @@ public abstract class AbstractApplicationEventMulticaster implements Application
             throw new BeansException("wrong event class name: " + className);
         }
         return eventClassName.isAssignableFrom(event.getClass());
-    }
-
-    /**
-     * 是否经过cglib代理了
-     */
-    protected boolean isCglibProxyClass(Class<?> listenerClass) {
-        return listenerClass != null && listenerClass.getName().contains("$$");
     }
 }

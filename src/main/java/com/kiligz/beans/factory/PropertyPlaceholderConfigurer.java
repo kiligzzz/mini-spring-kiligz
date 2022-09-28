@@ -1,6 +1,7 @@
 package com.kiligz.beans.factory;
 
 import cn.hutool.core.util.StrUtil;
+import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
 import com.kiligz.beans.PropertyValues;
@@ -12,7 +13,6 @@ import com.kiligz.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -35,11 +35,16 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        System.out.println("-------> [ replace xml placeholder ]");
+
         // 加载属性配置文件
         Properties properties = loadProperties();
 
-        // 属性值替换占位符
+        // 属性值替换占位符（对BeanDefinition操作）
         processProperties(beanFactory, properties);
+
+        // 添加嵌入式Value解析器（bean实例化之后，设置属性之前，在自动装配注解BeanPostProcessor中执行）
+        beanFactory.addEmbeddedValueResolver(new PlaceholderResolvingStringValueResolver(properties));
     }
 
     /**
@@ -78,17 +83,46 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
         for (PropertyValue pv : pvs.getPropertyValues()) {
             Object value = pv.getValue();
             if (value instanceof String) {
-                String str = (String) value;
-                String replaceFrom = StrUtil.subBetween(str, PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
-                String replaceTo = Optional.ofNullable(replaceFrom)
-                        .map(properties::getProperty)
-                        .orElse(null);
-                if (replaceTo != null) {
-                    str = str.replace(PLACEHOLDER_PREFIX + replaceFrom + PLACEHOLDER_SUFFIX,
-                            replaceTo);
-                    pvs.addPropertyValue(new PropertyValue(pv.getName(), str));
-                }
+                value = resolvePlaceholder((String) value, properties);
+                pvs.addPropertyValue(new PropertyValue(pv.getName(), value));
             }
+        }
+    }
+
+    /**
+     * 解析占位符
+     */
+    private static String resolvePlaceholder(String str, Properties properties) {
+        // 占位符内容
+        String content = StrUtil.subBetween(str, PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        if (content == null) return str;
+
+        // 替换占位符的值
+        String value = properties.getProperty(content);
+
+        // 占位符整体
+        String placeholder = PLACEHOLDER_PREFIX + content + PLACEHOLDER_SUFFIX;
+        if (value == null)
+            throw new BeansException(String.format(
+                    "Could not resolve placeholder '%s' in value '%s'.", content, placeholder));
+
+        // 返回替换后的结果
+        return str.replace(placeholder, value);
+    }
+
+    /**
+     * 占位符String值解析器
+     */
+    private static class PlaceholderResolvingStringValueResolver implements StringValueResolver {
+
+        private final Properties properties;
+
+        public PlaceholderResolvingStringValueResolver(Properties properties) {
+            this.properties = properties;
+        }
+
+        public String resolveStringValue(String str) throws BeansException {
+            return resolvePlaceholder(str, properties);
         }
     }
 }

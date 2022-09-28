@@ -7,8 +7,10 @@ import com.kiligz.aop.TargetSource;
 import com.kiligz.aop.aspectj.AspectjExpressionPointcutAdvisor;
 import com.kiligz.aop.framework.ProxyFactory;
 import com.kiligz.beans.BeansException;
+import com.kiligz.beans.PropertyValues;
 import com.kiligz.beans.factory.BeanFactory;
 import com.kiligz.beans.factory.BeanFactoryAware;
+import com.kiligz.beans.factory.ConfigurableListableBeanFactory;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import com.kiligz.beans.factory.support.DefaultListableBeanFactory;
@@ -26,17 +28,17 @@ import java.util.Collection;
  * @date 2022/9/19 10:23
  */
 public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, InstantiationAwareBeanPostProcessor {
-    private DefaultListableBeanFactory beanFactory;
+    private ConfigurableListableBeanFactory beanFactory;
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = (DefaultListableBeanFactory) beanFactory;
+        this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
     }
 
     @Override
-    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         // 避免死循环，利用advisor生成代理对象，advisor就不需要了
-        if (isInfrastructureClass(beanClass)) {
+        if (isInfrastructureClass(bean.getClass())) {
             return null;
         }
 
@@ -46,12 +48,12 @@ public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, Instant
         try {
             for (AspectjExpressionPointcutAdvisor advisor : advisors) {
                 ClassFilter classFilter = advisor.getPointcut().getClassFilter();
-                if (classFilter.matches(beanClass)) {
+                if (classFilter.matches(bean.getClass())) {
                     // 实例化bean构造被代理对象的封装
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
                     // 不用代理创建bean，否则代理两次有问题
-                    Object bean = new SimpleInstantiationStrategy().instantiate(beanDefinition);
-                    TargetSource targetSource = new TargetSource(bean);
+                    Object noProxyBean = new SimpleInstantiationStrategy().instantiate(beanDefinition);
+                    TargetSource targetSource = new TargetSource(noProxyBean);
 
                     ProxyFactory proxyFactory = new ProxyFactory();
                     proxyFactory.setTargetSource(targetSource);
@@ -75,15 +77,5 @@ public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, Instant
         return Advice.class.isAssignableFrom(beanClass)
                 || Pointcut.class.isAssignableFrom(beanClass)
                 || Advisor.class.isAssignableFrom(beanClass);
-    }
-
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
     }
 }

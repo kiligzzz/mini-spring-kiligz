@@ -5,12 +5,12 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
+import com.kiligz.beans.PropertyValues;
 import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
 import com.kiligz.beans.factory.config.*;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
@@ -35,7 +35,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
         System.out.printf("----------> [ create bean: %s ]%n", beanName);
         
-        // 如果bean需要代理，则直接返回代理对象
+        // 如果bean实例化之前需要处理，则直接返回处理后对象，不放入singletonObjects中
         Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
         if (bean != null)
             return bean;
@@ -44,7 +44,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 在实例化之前判断是否需要代理bean，执行InstantiationAwareBeanPostProcessor的方法
+     * 在实例化之前判断是否需要处理（自定义bean不需要自动代理，也就会放入singletonObjects）
+     * 执行InstantiationAwareBeanPostProcessor的方法
      */
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
         Object bean = applyBeanPostProcessorsBeforeInstantiation(beanName, beanDefinition.getBeanClass());
@@ -60,10 +61,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 根据BeanDefinition创建bean，创建完成后加入单例的bean表中
      */
     private Object doCreateBean(String beanName, BeanDefinition beanDefinition) {
+        // 依据策略实例化bean
         Object bean = createBeanInstance(beanDefinition);
+
+        // 应用实例化之后的BeanPostProcessors，任意一个返回false，则不继续逻辑
+        boolean continueLogic = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
+        if (!continueLogic)
+            return bean;
+
+        // 实例化后，为bean设置属性前，应用BeanPostProcessors（@Value、@Autowired注解修改PropertyValues值）
+        applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
+
+        // 为bean填充属性
         applyPropertyValues(beanName, bean, beanDefinition);
+
+        // 初始化bean，执行前置处理，执行初始化方法，执行后置处理
         bean = initializeBean(beanName, bean, beanDefinition);
+
+        // 注册有销毁方法的bean（singleton类型的bean才需要注册），即bean继承自DisposableBean或有自定义的销毁方法
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
+        // 缓存bean
         if (beanDefinition.isSingleton()) {
             addSingleton(beanName, bean);
         }
@@ -71,7 +89,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 应用实例化之前的BeanPostProcessors（如使用pointcutAdvisor为其生成代理对象）
+     * 应用实例化之前的BeanPostProcessors
      */
     protected Object applyBeanPostProcessorsBeforeInstantiation(String beanName, Class<?> beanClass) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
@@ -92,10 +110,38 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
+     * 应用实例化之后的BeanPostProcessors，任意一个返回false，则不继续逻辑
+     */
+    protected boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                boolean continueLogic = ((InstantiationAwareBeanPostProcessor) beanPostProcessor)
+                        .postProcessAfterInstantiation(bean, beanName);
+                if (!continueLogic)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 实例化后，为bean设置属性前，应用BeanPostProcessors（@Value、@Autowired注解修改PropertyValues值）
+     */
+    protected void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                 PropertyValues pvs = ((InstantiationAwareBeanPostProcessor) beanPostProcessor)
+                        .postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, beanName);
+                 beanDefinition.setPropertyValues(pvs);
+            }
+        }
+    }
+
+    /**
      * 为bean填充属性
      */
     protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
-        System.out.println("--------------> [ apply propertyValues ]");
+        System.out.println("--------------> [ apply PropertyValues ]");
         try {
             for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValues()) {
                 String name = propertyValue.getName();
@@ -116,7 +162,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 初始化bean
+     * 初始化bean，执行前置处理，执行初始化方法，执行后置处理
      */
     protected Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
         System.out.printf("--------------> [ initialize %s ]%n", beanName);
@@ -146,7 +192,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
-     * 执行BeanPostProcessor的前置处理
+     * 执行BeanPostProcessor的后置处理（如使用pointcutAdvisor为其生成代理对象）
      */
     @Override
     public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {

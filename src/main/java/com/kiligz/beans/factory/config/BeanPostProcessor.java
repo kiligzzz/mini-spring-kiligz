@@ -12,10 +12,14 @@ public interface BeanPostProcessor {
     /**
      * 在bean执行初始化方法之前执行此方法
      */
-    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
+    default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
 
     /**
      * 在bean执行初始化方法之后执行此方法
      */
-    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
+    default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
 }

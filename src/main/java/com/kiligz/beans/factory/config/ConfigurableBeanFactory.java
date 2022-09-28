@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.config;
 
+import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.factory.HierarchicalBeanFactory;
 
 /**
@@ -18,4 +19,14 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * 销毁单例bean
      */
     void destroySingletons();
+
+    /**
+     * 添加嵌入式Value解析器
+     */
+    void addEmbeddedValueResolver(StringValueResolver resolver);
+
+    /**
+     * 解析嵌入式的Value
+     */
+    String resolveEmbeddedValue(String value);
 }

@@ -1,6 +1,7 @@
 package com.kiligz.beans.factory.support;
 
-import cn.hutool.core.util.StrUtil;
+import com.kiligz.util.ClassUtil;
+import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.FactoryBean;
 import com.kiligz.beans.factory.config.BeanDefinition;
@@ -26,6 +27,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
 
     private final Map<String, Object> factoryBeanCache = new HashMap<>();
 
+    private final List<StringValueResolver> embeddedValueResolverList = new ArrayList<>();
+
     /**
      * 延迟加载，在使用bean时才加载创建bean，使用前以BeanDefinition保存对应信息
      */
@@ -48,7 +51,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      */
     @Override
     public <T> T getBean(Class<T> beanClass) throws BeansException {
-        String beanName = StrUtil.lowerFirst(beanClass.getSimpleName());
+        String beanName = ClassUtil.getBeanNameFromClass(beanClass);
         return beanClass.cast(doGetBean(beanName));
     }
 
@@ -87,6 +90,26 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
     }
 
     /**
+     * 添加嵌入式Value解析器
+     */
+    @Override
+    public void addEmbeddedValueResolver(StringValueResolver resolver) {
+        embeddedValueResolverList.add(resolver);
+    }
+
+    /**
+     * 解析嵌入式Value
+     */
+    @Override
+    public String resolveEmbeddedValue(String value) {
+
+        for (StringValueResolver resolver : embeddedValueResolverList) {
+            value = resolver.resolveStringValue(value);
+        }
+        return value;
+    }
+
+    /**
      * 获取所有BeanPostProcessor
      */
     public List<BeanPostProcessor> getBeanPostProcessors() {
@@ -110,6 +133,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
                     }
                 } else {
                     bean = factoryBean.getObject();
+                    factoryBeanCache.put(beanName, bean);
                 }
             } catch (Exception e) {
                 throw new BeansException("FactoryBean threw exception on object[" + beanName + "] creation", e);
