@@ -1,6 +1,11 @@
 package com.kiligz.test.extend;
 
 import com.kiligz.context.support.ClassPathXmlApplicationContext;
+import com.kiligz.core.convert.ConversionService;
+import com.kiligz.core.convert.support.DefaultConversionService;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Ivan
@@ -10,7 +15,16 @@ public class TestExtend {
     public static final ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/spring-extend.xml");
 
     public static void main(String[] args) {
-        testAutowired();
+        testConvertor();
+    }
+
+    /**
+     * 转换器
+     */
+    public static void testConvertor() {
+        ConversionService conversionService = new DefaultConversionService();
+        System.out.println(conversionService.canConvert(String.class, Float.class));
+        System.out.println(conversionService.convert("3", Float.class));
     }
 
     /**
