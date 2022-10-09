@@ -8,13 +8,13 @@ package com.kiligz.core.convert.support;
  */
 public class DefaultConversionService extends GenericConversionService {
     public DefaultConversionService() {
-        addDefaultConvertors();
+        addDefaultConverters();
     }
 
     /**
      * 添加默认的转换器
      */
-    public void addDefaultConvertors() {
+    public void addDefaultConverters() {
         addConverterFactory(new StringToNumberConverterFactory());
     }
 }

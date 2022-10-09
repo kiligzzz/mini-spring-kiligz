@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.config;
 
+import com.kiligz.core.convert.ConversionService;
 import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.factory.HierarchicalBeanFactory;
 
@@ -29,4 +30,14 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * 解析嵌入式的Value
      */
     String resolveEmbeddedValue(String value);
+
+    /**
+     * 注册类型转换服务
+     */
+    void setConversionService(ConversionService conversionService);
+
+    /**
+     * 获取类型转换服务
+     */
+    ConversionService getConversionService();
 }

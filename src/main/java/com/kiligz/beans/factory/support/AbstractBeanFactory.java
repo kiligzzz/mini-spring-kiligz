@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.support;
 
+import com.kiligz.core.convert.ConversionService;
 import com.kiligz.util.ClassUtil;
 import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.BeansException;
@@ -29,6 +30,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
 
     private final List<StringValueResolver> embeddedValueResolverList = new ArrayList<>();
 
+    private ConversionService conversionService;
+
     /**
      * 延迟加载，在使用bean时才加载创建bean，使用前以BeanDefinition保存对应信息
      */
@@ -56,6 +59,22 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
     }
 
     /**
+     * 是否包含bean
+     */
+    @Override
+    public boolean containsBean(String beanName) {
+        return containsBeanDefinition(beanName);
+    }
+
+    /**
+     * 是否包含bean
+     */
+    @Override
+    public <T> boolean containsBean(Class<T> beanClass) {
+        return containsBeanDefinition(beanClass.getSimpleName());
+    }
+
+    /**
      * 延迟加载bean的实现
      */
     protected Object doGetBean(String beanName) {
@@ -69,6 +88,11 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
         Object bean = createBean(beanName, beanDefinition);
         return getObjectForBeanInstance(bean, beanName);
     }
+
+    /**
+     * 是否包含BeanDefinition
+     */
+    protected abstract boolean containsBeanDefinition(String beanName);
 
     /**
      * 获取BeanDefinition，延迟实现
@@ -102,11 +126,26 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      */
     @Override
     public String resolveEmbeddedValue(String value) {
-
         for (StringValueResolver resolver : embeddedValueResolverList) {
             value = resolver.resolveStringValue(value);
         }
         return value;
+    }
+
+    /**
+     * 注册类型转换服务
+     */
+    @Override
+    public void setConversionService(ConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
+    /**
+     * 获取类型转换服务
+     */
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
     }
 
     /**

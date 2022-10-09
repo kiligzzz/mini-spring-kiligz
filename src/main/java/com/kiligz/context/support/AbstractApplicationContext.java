@@ -12,6 +12,7 @@ import com.kiligz.context.event.ApplicationEventMulticaster;
 import com.kiligz.context.event.ContextClosedEvent;
 import com.kiligz.context.event.ContextRefreshedEvent;
 import com.kiligz.context.event.SimpleApplicationEventMulticaster;
+import com.kiligz.core.convert.ConversionService;
 import com.kiligz.core.io.DefaultResourceLoader;
 
 import java.util.Collection;
@@ -59,8 +60,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         // 7. 注册事件监听器
         registerListeners();
 
-        // 8. 提前实例化单例bean
-        beanFactory.preInstantiateSingletons();
+        // 8. 注册类型转换器 & 提前实例化单例bean
+        finishBeanFactoryInitialization(beanFactory);
 
         // 9. 发布容器刷新完成事件
         finishRefresh();
@@ -136,6 +137,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     }
 
     /**
+     * 完成beanFactory的初始化（注册类型转换器 & 提前实例化单例bean）
+     */
+    protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+        // 注册类型转换器，自定义类型转换服务？？
+        if (beanFactory.containsBean(ConversionService.class)) {
+            System.out.println("---> [ register conversionService ] ");
+
+            ConversionService conversionService = beanFactory.getBean(ConversionService.class);
+            beanFactory.setConversionService(conversionService);
+        }
+
+        // 提前实例化单例bean
+        beanFactory.preInstantiateSingletons();
+    }
+
+    /**
      * 发布容器刷新完成事件
      */
     protected void finishRefresh() {
@@ -188,6 +205,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     public <T> T getBean(Class<T> beanClass) throws BeansException {
         return getBeanFactory().getBean(beanClass);
+    }
+
+    /**
+     * 是否包含bean
+     */
+    @Override
+    public boolean containsBean(String beanName) {
+        return getBeanFactory().containsBean(beanName);
+    }
+
+    /**
+     * 是否包含bean
+     */
+    @Override
+    public <T> boolean containsBean(Class<T> beanClass) {
+        return getBeanFactory().containsBean(beanClass);
     }
 
     /**

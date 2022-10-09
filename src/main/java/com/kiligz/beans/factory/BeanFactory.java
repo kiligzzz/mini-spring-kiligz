@@ -15,4 +15,8 @@ public interface BeanFactory {
     <T> T getBean(String beanName, Class<T> beanClass) throws BeansException;
 
     <T> T getBean(Class<T> beanClass) throws BeansException;
+
+    boolean containsBean(String beanName);
+
+    <T> boolean containsBean(Class<T> beanClass);
 }

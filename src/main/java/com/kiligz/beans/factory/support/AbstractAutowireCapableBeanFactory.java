@@ -3,6 +3,7 @@ package com.kiligz.beans.factory.support;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
 import com.kiligz.beans.PropertyValues;
@@ -10,6 +11,7 @@ import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
 import com.kiligz.beans.factory.config.*;
+import com.kiligz.util.ConvertUtil;
 
 import java.lang.reflect.Method;
 
@@ -152,7 +154,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     BeanReference beanReference = (BeanReference) value;
                     System.out.printf("-------> [ ref bean: %s ]%n", beanReference.getBeanName());
                     value = getBean(beanReference.getBeanName());
+                } else {
+                    // 类型转换
+                    value = ConvertUtil.convert(
+                            getConversionService(), value, TypeUtil.getFieldType(bean.getClass(), name));
                 }
+
                 // 属性填充
                 BeanUtil.setFieldValue(bean, name, value);
             }

@@ -1,5 +1,6 @@
 package com.kiligz.beans.factory.annotation;
 
+import cn.hutool.core.util.TypeUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
 import com.kiligz.beans.PropertyValues;
@@ -9,6 +10,7 @@ import com.kiligz.beans.factory.ConfigurableListableBeanFactory;
 import com.kiligz.beans.factory.config.BeanReference;
 import com.kiligz.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import com.kiligz.util.ClassUtil;
+import com.kiligz.util.ConvertUtil;
 
 import java.lang.reflect.Field;
 
@@ -41,7 +43,12 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanFactoryAware, I
             if (valueAnnotation == null) continue;
 
             System.out.println("------------------> [ process @Value annotation ]");
-            String value = beanFactory.resolveEmbeddedValue(valueAnnotation.value());
+            Object value = beanFactory.resolveEmbeddedValue(valueAnnotation.value());
+
+            // 类型转换
+            value = ConvertUtil.convert(
+                    beanFactory.getConversionService(), value, TypeUtil.getType(field));
+
             pvs.addPropertyValue(new PropertyValue(field.getName(), value));
         }
 
