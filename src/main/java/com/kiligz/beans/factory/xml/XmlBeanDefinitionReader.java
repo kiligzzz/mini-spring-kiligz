@@ -10,6 +10,7 @@ import com.kiligz.beans.factory.support.BeanDefinitionRegistry;
 import com.kiligz.context.annotation.ClassPathBeanDefinitionScanner;
 import com.kiligz.core.io.Resource;
 import com.kiligz.core.io.ResourceLoader;
+import com.kiligz.util.LogUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -80,7 +81,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
      * 从输入流中加载BeanDefinition
      */
     private void doLoadBeanDefinitions(InputStream is) throws DocumentException {
-        System.out.println("---> [ read xml && load beanDefinitions ] ");
+        LogUtil.readXmlAndLoadBeanDefinition();
+
         SAXReader reader = new SAXReader();
         Document document = reader.read(is);
 
@@ -151,7 +153,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
      * 扫描注解Component的类，提取信息，组装成BeanDefinition
      */
     private void scanPackage(String scanPath) {
-        System.out.printf("-------> [ scan package: %s ]%n", scanPath);
+        LogUtil.scanPackage(scanPath);
 
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(getRegistry());
         scanner.doScan(scanPath.split(","));

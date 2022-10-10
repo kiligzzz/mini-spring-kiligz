@@ -14,6 +14,7 @@ import com.kiligz.context.event.ContextRefreshedEvent;
 import com.kiligz.context.event.SimpleApplicationEventMulticaster;
 import com.kiligz.core.convert.ConversionService;
 import com.kiligz.core.io.DefaultResourceLoader;
+import com.kiligz.util.LogUtil;
 
 import java.util.Collection;
 import java.util.Map;
@@ -37,7 +38,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     @Override
     public void refresh() throws BeansException {
-        System.out.println("[ refresh ] ");
+        LogUtil.refresh();
 
         // 1. 创建BeanFactory，并加载BeanDefinition
         refreshBeanFactory();
@@ -90,7 +91,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 在bean实例化之前，执行BeanFactoryPostProcessor
      */
     protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-        System.out.println("---> [ invoke beanFactoryPostProcessor ] ");
+        LogUtil.invokeBeanFactoryPostProcessor();
 
         Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeansOfType(BeanFactoryPostProcessor.class);
         for (BeanFactoryPostProcessor beanFactoryPostProcessor : beanFactoryPostProcessorMap.values()) {
@@ -102,7 +103,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 注册BeanPostProcessor
      */
     protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-        System.out.println("---> [ register beanPostProcessors ] ");
+        LogUtil.registerBeanPostProcessors();
 
         Map<String, BeanPostProcessor> beanPostProcessorMap = beanFactory.getBeansOfType(BeanPostProcessor.class);
         for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
@@ -114,7 +115,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 初始化应用事件广播器
      */
     private void initApplicationEventMulticaster() {
-        System.out.println("---> [ init ApplicationEventMulticaster ] ");
+        LogUtil.initApplicationEventMulticaster();
 
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
         applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
@@ -128,7 +129,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     @SuppressWarnings("all")
     protected void registerListeners() {
-        System.out.println("---> [ register ApplicationListeners ] ");
+        LogUtil.registerApplicationListeners();
 
         Collection<ApplicationListener> applicationListeners = getBeansOfType(ApplicationListener.class).values();
         for (ApplicationListener applicationListener : applicationListeners) {
@@ -142,7 +143,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
         // 注册类型转换器，自定义类型转换服务？？
         if (beanFactory.containsBean(ConversionService.class)) {
-            System.out.println("---> [ register conversionService ] ");
+            LogUtil.registerConversionService();
 
             ConversionService conversionService = beanFactory.getBean(ConversionService.class);
             beanFactory.setConversionService(conversionService);
@@ -164,7 +165,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     @Override
     public void publishEvent(ApplicationEvent event) {
-        System.out.printf("---> [ publish %s ]%n", event.getClass().getSimpleName());
+        LogUtil.publishEvent(event.getClass().getSimpleName());
 
         applicationEventMulticaster.multicastEvent(event);
     }
@@ -235,7 +236,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * 关闭应用上下文的实现
      */
     protected void doClose() {
-        System.out.println("[ do close ]");
+        LogUtil.close();
+
         //发布容器关闭事件
         publishEvent(new ContextClosedEvent(this));
         destroyBeans();

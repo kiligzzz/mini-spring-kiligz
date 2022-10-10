@@ -12,6 +12,7 @@ import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
 import com.kiligz.beans.factory.config.*;
 import com.kiligz.util.ConvertUtil;
+import com.kiligz.util.LogUtil;
 
 import java.lang.reflect.Method;
 
@@ -35,7 +36,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
-        System.out.printf("----------> [ create bean: %s ]%n", beanName);
+        LogUtil.createBean(beanName);
         
         // 如果bean实例化之前需要处理，则直接返回处理后对象，不放入singletonObjects中
         Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
@@ -66,6 +67,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 依据策略实例化bean
         Object bean = createBeanInstance(beanDefinition);
 
+        // 处理循环依赖，将实例化后的Bean对象提前放入缓存中暴露出来
+        if (beanDefinition.isSingleton()) {
+            Object finalBean = bean;
+            addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, finalBean));
+        }
+
         // 应用实例化之后的BeanPostProcessors，任意一个返回false，则不继续逻辑
         boolean continueLogic = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
         if (!continueLogic)
@@ -83,11 +90,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 注册有销毁方法的bean（singleton类型的bean才需要注册），即bean继承自DisposableBean或有自定义的销毁方法
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
-        // 缓存bean
+        // todo 缓存bean
+        Object exposedObject = bean;
         if (beanDefinition.isSingleton()) {
-            addSingleton(beanName, bean);
+            exposedObject = getSingleton(beanName);
+            addSingleton(beanName, exposedObject);
         }
-        return bean;
+        return exposedObject;
     }
 
     /**
@@ -109,6 +118,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     protected Object createBeanInstance(BeanDefinition beanDefinition) {
         return instantiationStrategy.instantiate(beanDefinition);
+    }
+
+    /**
+     * 获取早期的bean的依赖
+     */
+    protected Object getEarlyBeanReference(String beanName, Object bean) {
+        Object exposedObject = bean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                exposedObject = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).getEarlyBeanReference(beanName, exposedObject);
+                if (exposedObject == null)
+                    break;
+            }
+        }
+        return exposedObject;
     }
 
     /**
@@ -143,7 +167,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 为bean填充属性
      */
     protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
-        System.out.println("--------------> [ apply PropertyValues ]");
+        LogUtil.applyPropertyValues();
         try {
             for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValues()) {
                 String name = propertyValue.getName();
@@ -152,7 +176,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 if (value instanceof BeanReference) {
                     // beanA依赖beanB，先实例化beanB
                     BeanReference beanReference = (BeanReference) value;
-                    System.out.printf("-------> [ ref bean: %s ]%n", beanReference.getBeanName());
+                    LogUtil.refBean(beanReference.getBeanName());
+
                     value = getBean(beanReference.getBeanName());
                 } else {
                     // 类型转换
@@ -172,10 +197,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 初始化bean，执行前置处理，执行初始化方法，执行后置处理
      */
     protected Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
-        System.out.printf("--------------> [ initialize %s ]%n", beanName);
+        LogUtil.initializeBean(beanName);
 
         if (bean instanceof BeanFactoryAware) {
-            System.out.println("------------------> [ set beanFactory ]");
+            LogUtil.setBeanFactory();
+
             ((BeanFactoryAware) bean).setBeanFactory(this);
         }
 
@@ -210,7 +236,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 执行初始化方法
      */
     protected void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
-        System.out.println("------------------> [ invoke initMethods ]");
+        LogUtil.invokeInitMethods();
 
         boolean isInitializeBean = bean instanceof InitializingBean;
         if (isInitializeBean) {

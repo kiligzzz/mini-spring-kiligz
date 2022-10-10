@@ -4,6 +4,7 @@ import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.config.BeanPostProcessor;
 import com.kiligz.context.ApplicationContext;
 import com.kiligz.context.ApplicationContextAware;
+import com.kiligz.util.LogUtil;
 
 /**
  * 通过BeanPostProcessor实现感知所属ApplicationContext功能
@@ -21,7 +22,8 @@ public class ApplicationContextAwareProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof ApplicationContextAware) {
-            System.out.println("------------------> [ set applicationContext ]");
+            LogUtil.setApplicationContext();
+
             ((ApplicationContextAware) bean).setApplicationContext(applicationContext);
         }
         return bean;

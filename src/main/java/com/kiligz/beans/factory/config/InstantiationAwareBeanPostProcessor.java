@@ -31,4 +31,12 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
     default PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
         return pvs;
     }
+
+    /**
+     * 获取早期的bean的依赖
+     * 在 Spring 中由 SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference 提供
+     */
+    default Object getEarlyBeanReference(String beanName, Object bean) {
+        return bean;
+    }
 }

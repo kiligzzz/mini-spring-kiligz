@@ -11,6 +11,7 @@ import com.kiligz.beans.factory.config.BeanReference;
 import com.kiligz.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import com.kiligz.util.ClassUtil;
 import com.kiligz.util.ConvertUtil;
+import com.kiligz.util.LogUtil;
 
 import java.lang.reflect.Field;
 
@@ -33,7 +34,8 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanFactoryAware, I
 
     @Override
     public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
-        System.out.println("--------------> [ process PropertyValues ]");
+        LogUtil.processPropertyValues();
+
         Class<?> clazz = ClassUtil.getOriginClass(bean.getClass());
         Field[] fields = clazz.getDeclaredFields();
 
@@ -41,8 +43,8 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanFactoryAware, I
         for (Field field : fields) {
             Value valueAnnotation = field.getAnnotation(Value.class);
             if (valueAnnotation == null) continue;
+            LogUtil.processValueAnnotation();
 
-            System.out.println("------------------> [ process @Value annotation ]");
             Object value = beanFactory.resolveEmbeddedValue(valueAnnotation.value());
 
             // 类型转换
@@ -57,7 +59,8 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanFactoryAware, I
             Autowired autowired = field.getAnnotation(Autowired.class);
 
             if (autowired != null) {
-                System.out.println("------------------> [ process @Autowired annotation ]");
+                LogUtil.processAutowiredAnnotation();
+
                 Qualifier qualifier = field.getAnnotation(Qualifier.class);
 
                 BeanReference beanReference = qualifier == null ?

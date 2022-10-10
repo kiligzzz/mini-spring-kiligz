@@ -15,10 +15,14 @@ import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import com.kiligz.beans.factory.support.DefaultListableBeanFactory;
 import com.kiligz.beans.factory.support.SimpleInstantiationStrategy;
+import com.kiligz.stereotype.Component;
+import com.kiligz.util.LogUtil;
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 默认的顾问自动代理创建者
@@ -27,8 +31,11 @@ import java.util.Collection;
  * @author Ivan
  * @date 2022/9/19 10:23
  */
+@Component
 public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, InstantiationAwareBeanPostProcessor {
     private ConfigurableListableBeanFactory beanFactory;
+
+    private final Set<Object> earlyProxyReferences = new HashSet<>();
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -37,12 +44,30 @@ public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, Instant
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        if (!earlyProxyReferences.contains(beanName)) {
+            LogUtil.postProcessAfterInitialization();
+
+            return wrapIfNecessary(beanName, bean);
+        }
+        return bean;
+    }
+
+    @Override
+    public Object getEarlyBeanReference(String beanName, Object bean) {
+        LogUtil.getEarlyBeanReference(beanName);
+
+        earlyProxyReferences.add(beanName);
+        return wrapIfNecessary(beanName, bean);
+    }
+
+    /**
+     * 包装如果有必要
+     */
+    private Object wrapIfNecessary(String beanName, Object bean) {
         // 避免死循环，利用advisor生成代理对象，advisor就不需要了
         if (isInfrastructureClass(bean.getClass())) {
-            return null;
+            return bean;
         }
-
-        System.out.println("------------------> [ postProcess before instantiation (autoProxy) ]");
 
         Collection<AspectjExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectjExpressionPointcutAdvisor.class).values();
         try {
@@ -67,7 +92,7 @@ public class DefaultAdvisorAutoProxyCreator implements BeanFactoryAware, Instant
         } catch (Exception e) {
             throw new BeansException("Error create proxy bean for: " + beanName, e);
         }
-        return null;
+        return bean;
     }
 
     /**

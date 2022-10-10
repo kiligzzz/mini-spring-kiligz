@@ -1,6 +1,7 @@
 package com.kiligz.aop.framework;
 
 import com.kiligz.aop.AdvisedSupport;
+import com.kiligz.util.LogUtil;
 
 /**
  * Aop代理工厂，根据有无接口自动选择jdk或cglib动态代理
@@ -14,11 +15,14 @@ public class ProxyFactory extends AdvisedSupport {
     }
 
     private AopProxy createAopProxy() {
+        String beanName = getTargetSource().getTarget().getClass().getSimpleName();
         if (getTargetSource().getTargetClass().length > 0) {
-            System.out.printf("-------> [ jdk aop %s ]%n", getTargetSource().getTarget().getClass().getSimpleName());
+            LogUtil.jdkAop(beanName);
+
             return new JdkDynamicAopProxy(this);
         }
-        System.out.printf("-------> [ cglib aop %s ]%n", getTargetSource().getTarget().getClass().getSimpleName());
+        LogUtil.cglibAop(beanName);
+
         return new CglibAopProxy(this);
     }
 }

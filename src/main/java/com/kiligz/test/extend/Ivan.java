@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * @author Ivan
  * @date 2022/9/23 10:51
  */
-@Component
+//@Component
 public class Ivan {
     @Value("${name}")
     String name;

@@ -3,6 +3,7 @@ package com.kiligz.beans.factory.support;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.ConfigurableListableBeanFactory;
 import com.kiligz.beans.factory.config.BeanDefinition;
+import com.kiligz.util.LogUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
      */
     @Override
     public void preInstantiateSingletons() throws BeansException {
-        System.out.println("---> [ pre instantiation Singletons ] ");
+        LogUtil.preInstantiateSingletons();
+
         beanDefinitionMap.keySet().forEach(this::getBean);
     }
 

@@ -2,6 +2,7 @@ package com.kiligz.context.support;
 
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.support.DefaultListableBeanFactory;
+import com.kiligz.util.LogUtil;
 
 /**
  * 抽象的可刷新的应用上下文
@@ -35,7 +36,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
      * 创建bean工厂
      */
     protected DefaultListableBeanFactory createBeanFactory() {
-        System.out.println("---> [ create defaultListableBeanFactory ] ");
+        LogUtil.createBeanFactory();
         return new DefaultListableBeanFactory();
     }
 

@@ -15,7 +15,7 @@ import java.util.Set;
  * @author Ivan
  * @date 2022/10/9 11:22
  */
-@Component("converters")
+//@Component("converters")
 public class ConverterFactoryBean implements FactoryBean<Set<?>> {
     @Override
     public Set<?> getObject() throws Exception {

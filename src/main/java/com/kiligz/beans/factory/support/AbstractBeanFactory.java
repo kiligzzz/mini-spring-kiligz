@@ -2,6 +2,7 @@ package com.kiligz.beans.factory.support;
 
 import com.kiligz.core.convert.ConversionService;
 import com.kiligz.util.ClassUtil;
+import com.kiligz.util.LogUtil;
 import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.FactoryBean;
@@ -78,7 +79,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
      * 延迟加载bean的实现
      */
     protected Object doGetBean(String beanName) {
-        System.out.printf("-------> [ get bean: %s ]%n", beanName);
+        LogUtil.getBean(beanName);
 
         Object sharedInstance = getSingleton(beanName);
         if (sharedInstance != null)
@@ -161,7 +162,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
     public Object getObjectForBeanInstance(Object beanInstance, String beanName) {
         Object bean = beanInstance;
         if (beanInstance instanceof FactoryBean<?>) {
-            System.out.println("----------> [ FactoryBean get object ]");
+            LogUtil.factoryBeanGetObject();
 
             FactoryBean<?> factoryBean = (FactoryBean<?>) beanInstance;
             try {

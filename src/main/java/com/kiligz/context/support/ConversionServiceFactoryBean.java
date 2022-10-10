@@ -11,6 +11,7 @@ import com.kiligz.core.convert.converter.GenericConverter;
 import com.kiligz.core.convert.support.DefaultConversionService;
 import com.kiligz.core.convert.support.GenericConversionService;
 import com.kiligz.stereotype.Component;
+import com.kiligz.util.LogUtil;
 
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import java.util.Set;
  * @author Ivan
  * @date 2022/10/8 17:45
  */
-@Component
+//@Component
 public class ConversionServiceFactoryBean implements FactoryBean<ConversionService>, InitializingBean {
     /**
      * 转换器集合，通过converterFactoryBean
@@ -39,7 +40,8 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.out.println("----------------------> [ register conversionService & converters ]");
+        LogUtil.registerConversionServiceAndConverters();
+
         conversionService = new DefaultConversionService();
         registerConverters();
     }

@@ -2,6 +2,7 @@ package com.kiligz.beans.factory.support;
 
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.factory.config.BeanDefinition;
+import com.kiligz.util.LogUtil;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
 
@@ -20,7 +21,7 @@ public class CglibSubclassingInstantiationStrategy implements InstantiationStrat
      */
     @Override
     public Object instantiate(BeanDefinition beanDefinition) throws BeansException {
-        System.out.printf("--------------> [ cglib create %s instance ]%n", beanDefinition.getBeanClass().getSimpleName());
+        LogUtil.cglibInstantiateBean(beanDefinition.getBeanClass().getSimpleName());
 
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(beanDefinition.getBeanClass());

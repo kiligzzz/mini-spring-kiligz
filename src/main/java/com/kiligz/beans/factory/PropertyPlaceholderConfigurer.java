@@ -1,6 +1,7 @@
 package com.kiligz.beans.factory;
 
 import cn.hutool.core.util.StrUtil;
+import com.kiligz.util.LogUtil;
 import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
@@ -35,7 +36,7 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        System.out.println("-------> [ replace xml placeholder ]");
+        LogUtil.replaceXmlPlaceHolderAndAddValueResolver();
 
         // 加载属性配置文件
         Properties properties = loadProperties();
