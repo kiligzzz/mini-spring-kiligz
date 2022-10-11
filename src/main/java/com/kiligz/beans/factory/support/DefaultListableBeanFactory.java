@@ -41,7 +41,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     /**
      * 向注册表中注册BeanDefinition，不允许重复的
      */
-    public void registerBeanDefinitionWithNoRepeated(String beanName, BeanDefinition beanDefinition) {
+    public void registerBeanDefinitionWithoutRepeated(String beanName, BeanDefinition beanDefinition) {
         if (containsBeanDefinition(beanName)) {
             throw new BeansException("Duplicate beanName[" + beanName + "] is not allowed.");
         }

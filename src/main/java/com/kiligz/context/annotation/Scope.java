@@ -7,6 +7,9 @@ import java.lang.annotation.*;
 /**
  * Scope注解
  *
+ * 包扫描时解析该注解
+ * @see ClassPathBeanDefinitionScanner#doScan(String...)
+ *
  * @author Ivan
  * @date 2022/9/23 12:04
  */

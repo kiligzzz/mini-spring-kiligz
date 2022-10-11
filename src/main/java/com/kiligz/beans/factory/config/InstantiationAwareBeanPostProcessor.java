@@ -4,7 +4,7 @@ import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValues;
 
 /**
- * 实例化时感知bean接口，可生成代理对象
+ * 实例化时感知bean接口
  *
  * @author Ivan
  * @date 2022/9/19 10:19
@@ -28,8 +28,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
     /**
      * 在bean实例化之后，设置属性之前执行（如@Value注解，@Autowired注解）
      */
-    default PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
-        return pvs;
+    default void postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
     }
 
     /**

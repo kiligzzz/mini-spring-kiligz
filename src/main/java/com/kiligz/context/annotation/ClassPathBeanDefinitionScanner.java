@@ -4,12 +4,18 @@ import cn.hutool.core.util.StrUtil;
 import com.kiligz.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import com.kiligz.beans.factory.config.BeanDefinition;
 import com.kiligz.beans.factory.support.BeanDefinitionRegistry;
+import com.kiligz.core.io.Resource;
 import com.kiligz.stereotype.Component;
+import com.kiligz.util.ClassUtil;
+import com.kiligz.util.LogUtil;
 
 import java.util.Set;
 
 /**
  * 类路径BeanDefinition扫描器
+ *
+ * 装载BeanDefinition的扫描包时
+ * @see com.kiligz.beans.factory.xml.XmlBeanDefinitionReader#loadBeanDefinitions(Resource)
  *
  * @author Ivan
  * @date 2022/9/23 12:11
@@ -19,7 +25,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
      * 自动装配注解处理器的bean名称
      */
     public static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME =
-            StrUtil.lowerFirst(AutowiredAnnotationBeanPostProcessor.class.getSimpleName());
+            ClassUtil.getBeanNameFromClass(AutowiredAnnotationBeanPostProcessor.class);
 
     private final BeanDefinitionRegistry registry;
 
@@ -37,12 +43,13 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                 resolveAnSetBeanScope(candidate);
 
                 String beanName = resolveBeanName(candidate);
-                registry.registerBeanDefinitionWithNoRepeated(beanName, candidate);
+                registry.registerBeanDefinitionWithoutRepeated(beanName, candidate);
             }
         }
 
         // 注册自动装配注解处理器的BeanDefinition
-        registry.registerBeanDefinitionWithNoRepeated(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
+        LogUtil.registerAutowiredAnnotationProcessor();
+        registry.registerBeanDefinitionWithoutRepeated(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
                 new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
     }
 
@@ -54,7 +61,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
         Component component = beanClass.getAnnotation(Component.class);
         String value = component.value();
         if (value.isEmpty()) {
-            return StrUtil.lowerFirst(beanClass.getSimpleName());
+            return ClassUtil.getBeanNameFromClass(beanClass);
         }
         return value;
     }

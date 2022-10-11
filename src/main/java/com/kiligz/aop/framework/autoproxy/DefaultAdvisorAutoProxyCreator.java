@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * 默认的顾问自动代理创建者
- * 在bean实例化之前执行创建代理对象返回
+ * 在bean初始化之后创建代理对象返回
  *
  * @author Ivan
  * @date 2022/9/19 10:23

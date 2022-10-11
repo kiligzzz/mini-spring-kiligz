@@ -6,7 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.kiligz.beans.BeansException;
 import com.kiligz.beans.PropertyValue;
-import com.kiligz.beans.PropertyValues;
 import com.kiligz.beans.factory.BeanFactoryAware;
 import com.kiligz.beans.factory.DisposableBean;
 import com.kiligz.beans.factory.InitializingBean;
@@ -90,7 +89,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 注册有销毁方法的bean（singleton类型的bean才需要注册），即bean继承自DisposableBean或有自定义的销毁方法
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
-        // todo 缓存bean
+        // 缓存bean
         Object exposedObject = bean;
         if (beanDefinition.isSingleton()) {
             exposedObject = getSingleton(beanName);
@@ -156,9 +155,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
-                 PropertyValues pvs = ((InstantiationAwareBeanPostProcessor) beanPostProcessor)
+                 ((InstantiationAwareBeanPostProcessor) beanPostProcessor)
                         .postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, beanName);
-                 beanDefinition.setPropertyValues(pvs);
             }
         }
     }
@@ -221,7 +219,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
-        return applyBeanPostProcessor(existingBean, beanName, true);
+        return applyBeanPostProcessorWithInitialization(existingBean, beanName, true);
     }
 
     /**
@@ -229,7 +227,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
-        return applyBeanPostProcessor(existingBean, beanName, false);
+        return applyBeanPostProcessorWithInitialization(existingBean, beanName, false);
     }
 
     /**
@@ -259,7 +257,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 注册有销毁方法的bean（singleton类型的bean才需要注册），即bean继承自DisposableBean或有自定义的销毁方法
      */
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
-
         if (beanDefinition.isSingleton()) {
             if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
                 registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
@@ -270,7 +267,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     /**
      * 执行BeanPostProcessors的方法
      */
-    protected Object applyBeanPostProcessor(Object existingBean, String beanName, boolean isBefore) {
+    protected Object applyBeanPostProcessorWithInitialization(Object existingBean, String beanName, boolean isBefore) {
         Object result = existingBean;
         for (BeanPostProcessor processor : getBeanPostProcessors()) {
             Object current = isBefore ?

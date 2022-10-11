@@ -16,7 +16,7 @@ import com.kiligz.util.LogUtil;
 import java.lang.reflect.Field;
 
 /**
- * 自动装配注解BeanPostProcessor
+ * 自动装配注解，BeanPostProcessor
  *
  * 在包扫描时添加
  * @see com.kiligz.context.annotation.ClassPathBeanDefinitionScanner#doScan(String...)
@@ -33,7 +33,7 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanFactoryAware, I
     }
 
     @Override
-    public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
+    public void postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
         LogUtil.processPropertyValues();
 
         Class<?> clazz = ClassUtil.getOriginClass(bean.getClass());
@@ -71,6 +71,5 @@ public class AutowiredAnnotationBeanPostProcessor implements BeanFactoryAware, I
                 pvs.addPropertyValue(pv);
             }
         }
-        return pvs;
     }
 }

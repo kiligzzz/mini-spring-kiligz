@@ -5,6 +5,9 @@ import java.lang.annotation.*;
 /**
  * Component注解
  *
+ * 包扫描时解析该注解
+ * @see com.kiligz.context.annotation.ClassPathBeanDefinitionScanner#doScan(String...)
+ *
  * @author Ivan
  * @date 2022/9/23 12:03
  */

@@ -10,6 +10,7 @@ import com.kiligz.beans.factory.support.BeanDefinitionRegistry;
 import com.kiligz.context.annotation.ClassPathBeanDefinitionScanner;
 import com.kiligz.core.io.Resource;
 import com.kiligz.core.io.ResourceLoader;
+import com.kiligz.util.ClassUtil;
 import com.kiligz.util.LogUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -119,7 +120,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             // id优先于name，如果id和name都为空，将类名的第一个字母转为小写后作为bean的名称
             String beanName = StrUtil.isNotEmpty(id) ? id
                     : StrUtil.isNotEmpty(name) ? name
-                    : StrUtil.lowerFirst(clazz.getSimpleName());
+                    : ClassUtil.getBeanNameFromClass(clazz);
 
             BeanDefinition beanDefinition = new BeanDefinition(clazz);
             beanDefinition.setInitMethodName(initMethodName);
@@ -145,7 +146,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             }
 
             // 注册BeanDefinition
-            getRegistry().registerBeanDefinitionWithNoRepeated(beanName, beanDefinition);
+            getRegistry().registerBeanDefinitionWithoutRepeated(beanName, beanDefinition);
         }
     }
 

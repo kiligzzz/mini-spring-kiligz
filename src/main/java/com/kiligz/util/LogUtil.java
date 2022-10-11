@@ -45,6 +45,13 @@ public class LogUtil {
     }
 
     /**
+     * 注册应用容器感知处理器，让实现ApplicationContextAware接口的类可以感知所属的ApplicationContext
+     */
+    public static void registerApplicationContextAwareProcessor() {
+        System.out.println("---> [ register ApplicationContextAware processor ] ");
+    }
+
+    /**
      * 在bean实例化之前，执行BeanFactoryPostProcessor
      */
     public static void invokeBeanFactoryPostProcessor() {
@@ -115,7 +122,7 @@ public class LogUtil {
      * 替换xml配置文件占位符（对BeanDefinition操作）,添加value解析器
      */
     public static void replaceXmlPlaceHolderAndAddValueResolver() {
-        System.out.println("-------> [ replace xml placeholder & add valueResolver ] ");
+        System.out.println("-------> [ replace xml placeholder & add valueResolver (resolve @Value placeholder) ] ");
     }
 
     /**
@@ -144,6 +151,13 @@ public class LogUtil {
 
 
     /**
+     * 注册自动装配注解处理器
+     */
+    public static void registerAutowiredAnnotationProcessor() {
+        System.out.println("----------> [ register AutowiredAnnotation processor ] ");
+    }
+
+    /**
      * 创建bean
      */
     public static void createBean(String beanName) {
@@ -161,7 +175,7 @@ public class LogUtil {
      * cglib策略实例化bean
      */
     public static void cglibInstantiateBean(String beanName) {
-        System.out.printf("--------------> [ cglib instantiate %s instance ] %n", beanName);
+        System.out.printf("--------------> [ cglib instantiate %s ] %n", beanName);
     }
 
     /**

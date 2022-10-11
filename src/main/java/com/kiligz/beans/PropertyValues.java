@@ -13,16 +13,10 @@ public class PropertyValues {
 
 	private final List<PropertyValue> propertyValueList = new ArrayList<>();
 
-	public void addPropertyValue(PropertyValue newPvs) {
-		for (PropertyValue pv : propertyValueList) {
-			// 覆盖原pv
-			if (pv.getName().equals(newPvs.getName())) {
-				propertyValueList.remove(pv);
-				propertyValueList.add(newPvs);
-				return;
-			}
-		}
-		propertyValueList.add(newPvs);
+	public void addPropertyValue(PropertyValue newPv) {
+		// 覆盖原pv
+		propertyValueList.removeIf(oldPv -> oldPv.getName().equals(newPv.getName()));
+		propertyValueList.add(newPv);
 	}
 
 	public PropertyValue[] getPropertyValues() {

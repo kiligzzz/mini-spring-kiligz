@@ -1,6 +1,7 @@
 package com.kiligz.beans.factory;
 
 import cn.hutool.core.util.StrUtil;
+import com.kiligz.context.support.AbstractApplicationContext;
 import com.kiligz.util.LogUtil;
 import com.kiligz.util.StringValueResolver;
 import com.kiligz.beans.BeansException;
@@ -17,7 +18,11 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Xml占位符配置类
+ * 占位符配置类
+ *
+ * beanFactory处理器，在refresh时，invokeBeanFactoryPostProcessors方法
+ * bean实例化之前，执行该BeanFactoryPostProcessor
+ * @see AbstractApplicationContext#refresh()
  *
  * @author Ivan
  * @date 2022/9/23 10:15

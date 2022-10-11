@@ -23,5 +23,5 @@ public interface BeanDefinitionRegistry {
     /**
      * 向注册表中注册BeanDefinition，不允许重复的
      */
-    void registerBeanDefinitionWithNoRepeated(String beanName, BeanDefinition beanDefinition);
+    void registerBeanDefinitionWithoutRepeated(String beanName, BeanDefinition beanDefinition);
 }

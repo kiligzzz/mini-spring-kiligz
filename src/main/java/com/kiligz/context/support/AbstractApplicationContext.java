@@ -14,6 +14,7 @@ import com.kiligz.context.event.ContextRefreshedEvent;
 import com.kiligz.context.event.SimpleApplicationEventMulticaster;
 import com.kiligz.core.convert.ConversionService;
 import com.kiligz.core.io.DefaultResourceLoader;
+import com.kiligz.util.ClassUtil;
 import com.kiligz.util.LogUtil;
 
 import java.util.Collection;
@@ -47,6 +48,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
         // 3. 添加ApplicationContextAwareProcessor，让继承自ApplicationContextAware的bean能感知所属ApplicationContext
+        LogUtil.registerApplicationContextAwareProcessor();
         beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
         // 4. 在bean实例化之前，执行BeanFactoryPostProcessor
@@ -120,7 +122,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
         applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 
-        String beanName = StrUtil.lowerFirst(applicationEventMulticaster.getClass().getSimpleName());
+        String beanName = ClassUtil.getBeanNameFromClass(applicationEventMulticaster.getClass());
         beanFactory.registerSingleton(beanName, applicationEventMulticaster);
     }
 
