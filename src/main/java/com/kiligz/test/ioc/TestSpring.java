@@ -11,7 +11,7 @@ import com.kiligz.context.support.ClassPathXmlApplicationContext;
 public class TestSpring {
 
     public static void main(String[] args) throws Exception {
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring/spring.xml");
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring/spring-ioc.xml");
 
         System.out.println("\n============== 使用bean ==============");
 
