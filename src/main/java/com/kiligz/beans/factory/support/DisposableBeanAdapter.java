@@ -9,8 +9,10 @@ import com.kiligz.beans.factory.config.BeanDefinition;
 import java.lang.reflect.Method;
 
 /**
- * @author derekyi
- * @date 2020/11/29
+ * bean销毁的适配器
+ *
+ * @author Ivan
+ * @date 2022/8/22 14:20
  */
 public class DisposableBeanAdapter implements DisposableBean {
 
