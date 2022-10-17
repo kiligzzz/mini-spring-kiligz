@@ -2,6 +2,9 @@
 > 简化的spring框架，保留spring核心功能，相比其它注释比较详细，加入了自己的理解，加入了执行的流程，欢迎star & 提出改进
 
 
+## 笔记
+[Mini-Spring](./Mini-Spring.md)
+
 
 ## 主要分为四部分
 
